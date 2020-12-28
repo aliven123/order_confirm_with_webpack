@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+		<title>确认订单</title>
+		<style type="text/css">
+			ul,
+			li,
+			body,
+			html,
+			h3,
+			h5,
+			p {
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				height: 100%;
+				position: relative;
+			}
+
+			.fl {
+				float: left;
+				background: none;
+				border: none;
+			}
+
+			.fr {
+				float: right;
+				background: none;
+				border: none;
+			}
+
+			.boxs {
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+				/* Firefox */
+				-webkit-box-sizing: border-box;
+				/* Safari */
+			}
+
+			.clearfix:after {
+				content: "";
+				display: block;
+				visibility: hidden;
+				height: 0;
+				clear: both;
+			}
+
+			.border_btm {
+				border-bottom: 1px solid #bcbcbd;
+			}
+
+			/* 上面是公共样式 */
+			h3 {
+				padding: 8px 4px;
+				color: #eb6100;
+				;
+			}
+
+			#main_ctn {
+				padding: 4px;
+			}
+
+			#main_ctn .need_state ul {
+				padding: 8px 4px;
+			}
+
+			#main_ctn .need_state li {
+				padding: 4px;
+				margin-right: 10px;
+				border: 1px solid white;
+				cursor: pointer;
+			}
+
+			#main_ctn .need_state li p {
+				height: 36px;
+			}
+
+			#main_ctn .need_state .active {
+				border: 1px solid #eb6100;
+			}
+
+			#main_ctn .need_state li textarea {
+				width: 220px;
+				resize: none;
+			}
+			#qrcode_ctn{
+				background:white;
+				width:170px;
+				height:215px;
+				position: fixed;
+				left:50%;
+				top:50%;
+				padding:10px;
+				transform:translate(-50%,-50%);
+				box-shadow: 0 0 5px black;
+			}
+			#qrcode_ctn .header{
+				color:#338af9;
+			}
+			#qrcode_ctn .header .close{
+				cursor: pointer;
+			}
+			#qrcode_ctn #qrcode{
+				margin-top:5px;
+			}
+			/* pc端样式 */
+			#IsPC input[type=button] {
+				background: #338af9;
+				color: white;
+				border: none;
+				cursor: pointer;
+				padding: 4px;
+			}
+
+			#IsPC .center_ctn {
+				padding: 10px 0;
+			}
+
+			#IsPC .center_ctn .g_c_ctn {
+				padding: 10px 0;
+			}
+
+			#IsPC .center_ctn .gold input[type=text] {
+				width: 70px;
+			}
+
+			#IsPC .center_ctn .gold {
+				width: 260px;
+				padding: 8px;
+				text-align: center;
+			}
+
+			#IsPC .center_ctn .gold .use_gold {
+
+				margin-top: 4px;
+			}
+
+			#IsPC .center_ctn .gold span {
+				color: #eb6100;
+			}
+
+			#IsPC .center_ctn .gold>p {
+				margin-bottom: 8px;
+			}
+
+			#IsPC .center_ctn .coupon {
+				width: 230px;
+				padding: 8px;
+				text-align: center;
+				border-left: 1px solid #bcbcbd;
+				border-right: 1px solid #bcbcbd;
+
+			}
+
+			#IsPC .center_ctn .coupon .coupon_ctn {
+				width: 95px;
+				margin: 0 auto;
+				padding: 5px;
+				background: #eb6100;
+				color: white;
+			}
+
+
+			#IsPC .center_ctn .coupon>p,
+			#IsPC .center_ctn .coupon>div {
+				margin-top: 8px;
+			}
+
+			#IsPC .center_ctn .message {
+				text-align: center;
+				padding: 8px;
+			}
+
+			#IsPC .center_ctn .message>p {
+				margin-bottom: 8px;
+			}
+
+			#IsPC .center_ctn .message textarea {
+				resize: none;
+				width: 120px;
+				height: 80px;
+			}
+
+			#IsPC .center_ctn .order_ctn {
+				padding: 10px 4px;
+				display: -webkit-flex;
+				display: -webkit-flex;
+				display: flex;
+				flex-flow: row wrap;
+				justify-content: space-around;
+				align-items: flex-start;
+			}
+
+			#IsPC .center_ctn .order_ctn .goods {
+				flex: 1;
+				max-height: 320px;
+				overflow: auto;
+				margin-right: 20px;
+			}
+
+			#IsPC .center_ctn .order_ctn .goods li {
+				margin-bottom: 10px;
+				display: -webkit-flex;
+				display: -webkit-flex;
+				display: flex;
+				flex-flow: row wrap;
+				//  主轴的对齐方式
+				justify-content: flex-start;
+				//  交叉轴上的对齐方式
+				align-items: flex-start;
+			}
+
+			#IsPC .center_ctn .order_ctn .goods li>div {
+				margin-right: 10px;
+			}
+
+			#IsPC .center_ctn .order_ctn .goods .pic {
+				width: 150px;
+			}
+
+			#IsPC .center_ctn .order_ctn .goods .pic img {
+				display: inline-block;
+				width: 100%;
+			}
+
+			#IsPC .center_ctn .order_ctn .goods li .des {
+				width: 200px;
+			}
+
+			#IsPC .center_ctn .order_ctn .goods li .price_num {
+				flex: 1;
+				text-align: right;
+				color: #eb6100;
+			}
+
+			#IsPC .center_ctn .order_ctn .orders_details {
+				margin-right: 50px;
+			}
+
+			#IsPC .invoice {
+				min-width: 360px;
+				margin-bottom: 10px;
+			}
+
+			#IsPC .invoice>div {
+				margin-bottom: 4px;
+			}
+
+			#IsPC .invoice .ipt_ctn {
+				display: -webkit-flex;
+				display: flex;
+				flex-flow: row wrap;
+				justify-content: flex-start;
+				align-items: center;
+				margin-top: 4px;
+			}
+
+			#IsPC .invoice .des {
+				display: inline-block;
+				width: 114px;
+			}
+
+			#IsPC .invoice .ipt_ctn input {
+				flex: 1;
+			}
+
+			#IsPC .invoice>p {
+				font-size: 14px;
+				color: gray;
+				margin-top: 4px;
+			}
+
+			#IsPC .bills {
+				border-top: 1px solid #bcbcbd
+			}
+
+			#IsPC .bills li {
+				margin-bottom: 4px;
+			}
+
+			#IsPC .bills .tips {
+				margin: 8px 0;
+				font-size: 14px;
+				color: gray;
+			}
+
+			#IsPC .bills li .des {
+				display: inline-block;
+				text-align: left;
+				width: 110px;
+			}
+
+			#IsPC .bills li .val {
+				color: #eb6100;
+			}
+
+			#IsPC .bills .total_ctn {
+				margin-top: 10px;
+				padding: 4px;
+				border: 1px solid #bcbcbd;
+			}
+
+			#IsPC .bills .total_ctn .action {
+				padding: 5px;
+				cursor: pointer;
+			}
+
+			#IsPC .bills .total_ctn .action .payment_order {
+				background: #338af9;
+				color: white;
+				padding: 4px;
+			}
+
+			/* 移动端样式 */
+			#IsPhone {
+				padding: 0 4px;
+			}
+
+			#IsPhone .goods_count .val {
+				color: #eb6100;
+			}
+
+			#IsPhone .goods {
+				width: 100%;
+				border-bottom: 1px solid #bcbcbd;
+				padding: 4px 0;
+				display: -webkit-flex;
+				display: flex;
+				flex-flow: row wrap;
+				justify-content: flex-start;
+				align-items: center;
+			}
+
+			#IsPhone .goods>.pic {
+				width: 20%;
+				height: 100% padding:10px;
+			}
+
+			#IsPhone .goods>.pic img {
+				display: inline-block;
+				max-width: 100%;
+				max-height: 100%;
+			}
+
+			#IsPhone .gold .checkbox_ctn {
+				text-align: right;
+			}
+
+			#IsPhone .gold,
+			#IsPhone .coupon,
+			#IsPhone .invoice,
+			#IsPhone .bills {
+				margin-top: 12px;
+			}
+
+			#IsPhone .coupon i {
+				font-style: normal;
+				font-size: 14px;
+				color: gray;
+			}
+
+			#IsPhone .invoice {
+				border-top: 1px solid #bcbcbd;
+				border-bottom: 1px solid #bcbcbd;
+				padding: 4px 0;
+			}
+
+			#IsPhone .invoice .ipt_ctn {
+				display: -webkit-flex;
+				display: flex;
+				flex-flow: row wrap;
+				justify-content: flex-start;
+				align-items: center;
+				margin-top: 4px;
+			}
+
+			#IsPhone .invoice .des {
+				display: inline-block;
+				width: 114px;
+			}
+
+			#IsPhone .invoice .ipt_ctn input {
+				flex: 1;
+			}
+
+			#IsPhone .invoice>p {
+				font-size: 14px;
+				color: gray;
+				margin-top: 4px;
+			}
+
+			#IsPhone .gold .val,
+			#IsPhone .coupon .val,
+			#IsPhone .invoice .val {
+				color: #eb6100;
+			}
+
+			#IsPhone .seperate {
+				height: 50px;
+			}
+
+			#IsPhone .bills li {
+				margin-bottom: 4px;
+			}
+
+			#IsPhone .bills .tips {
+				margin: 8px 0;
+				font-size: 14px;
+				color: gray;
+			}
+
+			#IsPhone .bills li .des {
+				display: inline-block;
+				text-align: left;
+				width: 110px;
+			}
+
+			#IsPhone .bills li .val {
+				color: #eb6100;
+			}
+
+			#IsPhone .bills .total_ctn {
+				padding: 4px;
+				border-top: 1px solid #bcbcbd;
+				width: 100%;
+				background: white;
+				position: fixed;
+				left: 50%;
+				bottom: -4px;
+				transform: translate(-50%);
+				box-shadow: 0 0 4px gray;
+			}
+
+			#IsPhone .bills .total_ctn .action {
+				padding: 5px;
+				cursor: pointer;
+			}
+
+			#IsPhone .bills .total_ctn .action {
+				padding: 5px;
+				cursor: pointer;
+			}
+
+			#IsPhone .bills .total_ctn .action .payment_order {
+				background: #338af9;
+				color: white;
+				padding: 4px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="main_ctn" class="boxs">
+			<h3 class="boxs border_btm">确认订单</h3>
+			<div id="qrcode_ctn" v-if="qrcode_ctn.hishow">
+				<div class="clearfix boxs header">
+					<span class="fl">微信扫码支付</span>
+					<span class="fr close" @click="closeQrcode">
+						关闭
+					</span>
+				</div>
+				<div id="qrcode"></div>
+				<p></p>
+			</div>
+			<template v-if="IsPC===true">
+				<!-- pc端 -->
+				<div class="need_state boxs border_btm">
+					<ul class="boxs clearfix">
+						<li v-for="(item,name) in need_state.menus" class="fl boxs" :class="{active:name===need_state.def}" @click="handleNeedstate(name)">
+							<h4 v-text="item.txt"></h4>
+							<template v-if="name==='not_delivery'">
+								<p v-text="item.val"></p>
+							</template>
+							<template v-else>
+								<textarea :style="{'width':IsPC?'402px':'220px'}" cols="3" placeholder="在这里输入收货地址 " v-model.trim="item.val">
+								</textarea>
+							</template>
+						</li>
+					</ul>
+				</div>
+				<div id="IsPC">
+					<div class="center_ctn boxs">
+						<!--金币和优惠券模块 -->
+						<div class="g_c_ctn border_btm clearfix">
+							<div class="gold boxs fl">
+								<p>可用金币<span>{{gold.available}}</span>（{{gold.transfer}}金币=¥1）</p>
+								<div>
+									<label>
+										使用金币
+										<input type="checkbox" v-model="gold.use_switch" />
+									</label>
+									<input type="number" min="0" max="100000000" placeholder="输金币数量" v-model.trim="gold.use_volumn">
+								</div>
+								<p class="use_gold">
+									已使用金币<span v-text="gold.use_volumn">0</span>个,
+									可抵扣<span>{{Golddeduct | RMB_symbol}}</span>
+								</p>
+							</div>
+							<div class="coupon boxs fl">
+								<div class="coupon_ctn">{{coupon.price | RMB_symbol}}</div>
+								<p>
+									优惠券{{coupon.volumn}}张
+									<label>
+										使用优惠券
+										<input type="checkbox" v-model="coupon.use_switch" />
+									</label>
+								</p>
+								<p>
+									使用
+									<input type="number" min="0" style="width:30px" v-model="coupon.use_volumn">
+									张，可抵扣{{coupon_deduct | RMB_symbol}}
+								</p>
+								<p>满{{coupon.limit | RMB_symbol}}可用</p>
+
+							</div>
+							<div class="message boxs fl">
+								<p>给商家留言</p>
+								<textarea rows="" cols="" v-model.trim="message">
+								</textarea>
+							</div>
+						</div>
+						<!-- 订单发票，对账单模块 -->
+						<div class="order_ctn boxs">
+							<ul class="goods boxs">
+								<li v-for="(item,index) in goods" :key="index" class="border_btm">
+									<div class="pic">
+										<img :src="item.pic">
+									</div>
+									<div class="des">{{item.des}}</div>
+									<div class="price_num">
+										<p>{{item.price | RMB_symbol}}</p>
+										<p>x{{item.volumn}}({{item.unit}})</p>
+									</div>
+								</li>
+							</ul>
+							<div class="orders_details boxs">
+								<div class="invoice boxs">
+									<div class="clearfix">
+										<span class="fl">发票（税率{{invoice.rate}}%）</span>
+										<label class="fr">
+											<span>发票</span>
+											<input type="checkbox" v-model="invoice.use_switch">
+										</label>
+									</div>
+									<template v-if="invoice.use_switch===true">
+										<div class="ipt_ctn boxs">
+											<span class="des">抬头：</span>
+											<input type="text" placeholder="请输入发票抬头">
+										</div>
+										<div class="ipt_ctn boxs">
+											<span class="des">纳税人识别号：</span>
+											<input type="text" placeholder="请输入纳税人识别号">
+										</div>
+										<div class="ipt_ctn boxs">
+											<span class="des">发票备注：</span>
+											<input type="text" placeholder="发票备注" v-model="invoice.msg">
+										</div>
+										<p>注：个人类型无需填写纳税人识别号</p>
+									</template>
+								</div>
+								<ul class="bills">
+									<li>
+										<span class="des">商品{{total_obj.volumn}}件，总计</span>
+										<span class="val">{{total_obj.price | RMB_symbol}}</span>
+									</li>
+									<li class="tips">
+										<span>使用优惠/金币/费用</span>
+									</li>
+									<li v-for="(item,name) in bills">
+										<span class="des">{{item.txt}}{{item.c_mode}}</span>
+										<span class="val">{{item.val | RMB_symbol}}</span>
+									</li>
+									<li class="clearfix total_ctn">
+										<div class="fl" style="line-height: 31px;">
+											<span>实付</span>
+											<span class="val">{{needPayment() | RMB_symbol}}</span>
+										</div>
+										<div class="fr action">
+											<span>
+												<label>
+													微信
+													<input type="radio" value="wx" v-model="payment.def">
+												</label>
+												<label>
+													支付宝
+													<input type="radio" value="zfb" v-model="payment.def">
+												</label>
+											</span>
+											<span class="payment_order" @click="handlePayment">
+												提交订单
+											</span>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</template>
+			<template v-else>
+
+				<div id="IsPhone">
+					<div class="boxs clearfix goods_count">
+						<span class="time fl">{{date_now}}</span>
+						<div class="fr boxs">
+							总额<span class="val">{{total_obj.price | RMB_symbol}}</span>
+							共<span class="val">{{total_obj.volumn}}</span>件&nbsp;
+						</div>
+					</div>
+					<div class="goods boxs">
+						<div class="pic boxs" v-for="(item,index) in goods" :key="index">
+							<img :src="item.pic">
+						</div>
+					</div>
+					<div class="need_state boxs border_btm">
+						<ul class="boxs clearfix">
+							<li v-for="(item,name) in need_state.menus" class="fl boxs" :class="{active:name===need_state.def}" @click="handleNeedstate(name)">
+								<h4 v-text="item.txt"></h4>
+								<template v-if="name==='not_delivery'">
+									<p v-text="item.val"></p>
+								</template>
+								<template v-else>
+									<textarea :style="{'width':IsPC?'402px':'220px'}" cols="3" placeholder="在这里输入收货地址 " v-model.trim="item.val">
+									</textarea>
+								</template>
+							</li>
+						</ul>
+					</div>
+					<div class="gold boxs">
+						<p class="clearfix">
+							<span class="fl">金币：<span class="val">{{gold.available}}个</span></span>
+							<span class="fr">（{{gold.transfer}}金币=¥1）</span>
+						</p>
+						<p class="use_gold clearfix">
+							<div class="fl">
+								<label>
+									使用金币
+								</label>
+								<input type="number" min="0" max="100000000" placeholder="输金币数量" v-model.trim="gold.use_volumn">个，
+							</div>
+							<div>
+								可抵扣<span>{{Golddeduct | RMB_symbol}}</span>
+							</div>
+						</p>
+						<p class="checkbox_ctn">
+							<label>
+								使用金币
+								<input type="checkbox" v-model="gold.use_switch" />
+							</label>
+						</p>
+					</div>
+					<div class="coupon boxs">
+						<div class="clearfix">
+							优惠券：<span class="val">{{coupon.volumn}}张</span>
+							<span class="fr">
+								（{{coupon.price | RMB_symbol}}）
+							</span>
+						</div>
+						<div class="clearfix">
+							<span class="fl">
+								使用
+								<input type="number" min="0" style="width:25px" v-model="coupon.use_volumn">
+								张，可抵扣{{coupon_deduct | RMB_symbol}}
+							</span>
+							<label class="fr">
+								使用优惠券
+								<input type="checkbox" v-model="coupon.use_switch" />
+							</label>
+						</div>
+						<i>注：满{{coupon.limit | RMB_symbol}}可用</i>
+					</div>
+					<div class="invoice boxs">
+						<div class="clearfix">
+							发票税率：<span class="val">{{invoice.rate}}%</span>
+							<label class="fr">
+								<span>发票</span>
+								<input type="checkbox" v-model="invoice.use_switch">
+							</label>
+						</div>
+						<!-- <template v-if="invoice.use_switch===true"> -->
+						<template>
+							<div class="ipt_ctn boxs">
+								<span class="des">抬头：</span>
+								<input type="text" placeholder="请输入发票抬头">
+							</div>
+							<div class="ipt_ctn boxs">
+								<span class="des">纳税人识别号：</span>
+								<input type="text" placeholder="请输入纳税人识别号">
+							</div>
+							<div class="ipt_ctn boxs">
+								<span class="des">发票备注：</span>
+								<input type="text" placeholder="发票备注" v-model="invoice.msg">
+							</div>
+							<p>注：个人类型无需填写纳税人识别号</p>
+						</template>
+					</div>
+					<ul class="bills boxs">
+						<li class="tips">
+							<span>使用优惠/金币/费用：</span>
+						</li>
+						<li v-for="(item,name) in bills">
+							<span class="des">{{item.txt}}{{item.c_mode}}</span>
+							<span class="val">{{item.val | RMB_symbol}}</span>
+						</li>
+						<li class="seperate"></li>
+						<li class="clearfix total_ctn boxs">
+							<div class="fl" style="line-height: 31px;">
+								<span>实付</span>
+								<span class="val">{{needPayment() | RMB_symbol}}</span>
+							</div>
+							<div class="fr action">
+								<span>
+									<label>
+										微信
+										<input type="radio" value="wx" v-model="payment.def">
+									</label>
+									<label>
+										支付宝
+										<input type="radio" value="zfb" v-model="payment.def">
+									</label>
+								</span>
+								<span class="payment_order" @click="handlePayment">
+									提交订单
+								</span>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</template>
+		</div>
+	</body>
+	<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+	<!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+	<!-- <script src="./qrcode.js"></script> -->
+	<script src="./qrcode.min.js"></script>
+	<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+	<script>
+		var ajaxfn = function(url, type, datatype, data, fn) { /*异步调用函数*/
+			$.ajax({
+				"url": url,
+				"type": type,
+				"async": true,
+				"xhrFields": {
+					"withCredentials": true
+				},
+				"dataType": datatype,
+				"data": data,
+				"success": function(res) {
+					fn(res);
+				},
+				"error": function(XMLHttpRequest, textStatus, errorThrown) {
+					var result = XMLHttpRequest.status + "," + XMLHttpRequest.readyState + "," + textStatus;
+					fn(result);
+				}
+			});
+		};
+		var queryToObj = function() {
+			var res = {};
+			var search = location.search.substr(1);
+			search.split('&').forEach(paramStr => {
+				var arr = paramStr.split('=');
+				var key = arr[0];
+				var val = arr[1];
+				res[key] = val;
+			});
+			return res;
+		};
+		var IsPC = function() {
+			var userAgentInfo = navigator.userAgent;
+			var Agents = ["Android", "iPhone",
+				"SymbianOS", "Windows Phone",
+				"iPad", "iPod"
+			];
+			var flag = true; /* pc端是true,手机端是false */
+			for (var v = 0; v < Agents.length; v++) {
+				if (userAgentInfo.indexOf(Agents[v]) > 0) {
+					flag = false;
+					break;
+				}
+			}
+			return flag;
+		}();
+		var dataNow = (function() {
+			function checktime(i) {
+				if (i < 10) {
+					i = '0' + i;
+				};
+				return i;
+			};
+			var mydata = new Date();
+			var y = mydata.getFullYear();
+			var month = mydata.getMonth() + 1;
+			var d = checktime(mydata.getDate());
+			return y + '-' + month + '-' + d;
+		})();
+		var vm = new Vue({
+			el: '#main_ctn',
+			data: {
+				host: '',
+				IsPC,
+				qrcode_ctn:{
+					hishow:false,
+					data:{}
+				},
+				date_now: dataNow,
+				need_state: {
+					def: 'not_delivery',
+					menus: {
+						not_delivery: {
+							txt: '不需要配送',
+							val: '不需要配送'
+						},
+						need_delivery: {
+							txt: '需要配送',
+							val: ''
+						}
+					}
+				},
+				gold: { //金币
+					available: 10000, //可用金币
+					use_volumn: 0, //使用金币的数量
+					transfer: 100,
+					use_switch: true
+				},
+				coupon: { //优惠券
+					volumn: 1, //张数
+					use_volumn: 0, //使用的张数
+					price: 100, //优惠券面值
+					limit: 1000, //满多少可用
+					use_switch: true
+				},
+				message: '', //给商家留言
+				goods: [
+					//商品列表
+					{
+						pic:'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1608285375145&di=f2ea0757f094aea4b8e71059d4aa9d84&imgtype=0&src=http%3A%2F%2Fattach.bbs.miui.com%2Fforum%2F201303%2F16%2F075154gfxiljfvfidzfcvt.jpg',
+						des:'豪华企业网站标准版豪华企业网站标准版',
+						price:'465',
+						volumn:'1'
+					},
+					{
+						pic:'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1025999189,4268722616&fm=26&gp=0.jpg',
+						des:'豪华企业网站标准版豪华企业标准版',
+						price:'564',
+						volumn:'3'
+					},
+					{
+						pic:'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1608285375145&di=f2ea0757f094aea4b8e71059d4aa9d84&imgtype=0&src=http%3A%2F%2Fattach.bbs.miui.com%2Fforum%2F201303%2F16%2F075154gfxiljfvfidzfcvt.jpg',
+						des:'豪华企业网站标准版豪华企业网站标准版',
+						price:'1111',
+						volumn:'1'
+					}
+				],
+				invoice: {
+					rate: 3,
+					use_switch: true,
+					head: '',
+					tax_id: '',
+					msg: ''
+				},
+				bills: {
+					gold: {
+						txt: '金币',
+						c_mode: '-',
+						val: '-'
+					},
+					coupon: {
+						txt: '优惠券',
+						c_mode: '-',
+						val: '-'
+					},
+					service_fee: {
+						txt: '手续费',
+						c_mode: '+',
+						val: '-'
+					},
+					freight_fee: {
+						txt: '运费',
+						c_mode: '+',
+						val: '-'
+					},
+					tax_fee: {
+						txt: '税金',
+						c_mode: '+',
+						val: '-'
+					}
+				},
+				payment: {
+					def: 'wx',
+					wx: {
+						api: 'weixin_pay'
+					},
+					zfb: {
+						api: 'ali_pay'
+					}
+				}
+			},
+			computed: {
+				total_obj() {
+					return this.goods.reduce((obj, item) => {
+						return {
+							price: obj.price + item.price * item.volumn,
+							volumn: obj.volumn + Number.parseInt(item.volumn)
+						}
+					}, {
+						price: 0,
+						volumn: 0
+					})
+				},
+				Golddeduct() {
+					//金币抵扣
+					var gold = this.gold;
+					if (Number.isNaN(Number.parseFloat(gold.use_volumn))) {
+						return 0
+					};
+					if (gold.use_switch === true) {
+						var use_volumn = Number.parseFloat(gold.use_volumn);
+
+						if (use_volumn > gold.available) {
+							return Number.parseFloat(gold.available) / gold.transfer
+						};
+						return use_volumn / gold.transfer
+					} else {
+						return 0
+					};
+				},
+				coupon_deduct() {
+					//优惠券抵扣
+					var coupon = this.coupon;
+					if (Number.isNaN(Number.parseFloat(coupon.use_volumn))) {
+						return 0
+					};
+					if (coupon.use_switch === true) {
+						var use_volumn = Number.parseFloat(coupon.use_volumn);
+						// 根据商品应付，计算的优惠券使用张数上限
+						var count_volumn = Math.floor(this.total_obj.price / this.coupon.limit);
+						// 优惠券使用数量上限，取优惠券数量和count_volumn两者中的最小值；
+						var upper_limit = Math.min(count_volumn, coupon.volumn);
+						if (use_volumn > upper_limit) {
+							return upper_limit * coupon.price
+						};
+						return use_volumn * coupon.price
+					} else {
+						return 0
+					};
+				}
+			},
+			watch: {
+				Golddeduct: {
+					immediate: true,
+					handler(newval) {
+						this.bills.gold.val = newval;
+						this.needPayment();
+					}
+				},
+				coupon_deduct: {
+					immediate: true,
+					handler(newval) {
+						this.bills.coupon.val = newval;
+						this.needPayment();
+					}
+				}
+			},
+			filters: {
+				RMB_symbol(value) {
+					if (value != undefined && value !== '') {
+						return '¥ '+value;
+					} else {
+						return value
+					}
+				}
+			},
+			methods: {
+				needPayment() {
+					var price = this.total_obj.price;
+					var bills = this.bills;
+					for (var key in bills) {
+						if (typeof bills[key].val === 'number') {
+							if (bills[key].c_mode === '-') {
+								price -= bills[key].val;
+							} else if (bills[key].c_mode === '+') {
+								price += bills[key].val;
+							}
+						}
+					};
+					if(price<0){price=0};
+					return price;
+				},
+				handleNeedstate(val) {
+					this.need_state.def = val;
+				},
+				getQrcode(){
+					setTimeout(()=>{
+						var qrcode=document.querySelector('#qrcode_ctn #qrcode');
+						$(qrcode).empty();
+						new QRCode("qrcode", {
+							text:this.qrcode_ctn.data.code_url,
+							width: 168,
+							height: 168,
+							colorDark : "#000000",
+							colorLight : "#ffffff",
+							correctLevel : QRCode.CorrectLevel.H
+						});
+					})
+				},
+				getQrcode(){
+					setTimeout(()=>{
+						var qrcode=document.querySelector('#qrcode_ctn #qrcode');
+						var code_url=this.qrcode_ctn.data.code_url;
+						console.log(code_url);
+						$(qrcode).empty();
+						$(qrcode).qrcode({
+							render:'canvas',
+							width:168,
+							height:168,
+							correctLevel:0,
+							text:code_url
+						}); 
+					},10)
+				},
+				closeQrcode(){
+					this.qrcode_ctn.hishow=false;
+				},
+				handlePayment() {
+					// if(this.needPayment()===0){return};
+					if(this.qrcode_ctn.hishow){
+						this.qrcode_ctn={
+							hishow:false,
+							data:{}
+						}
+						return;
+					}
+					var def = this.payment.def;
+					var api = this.payment[def].api;
+					var url = this.host+'/order/daifa_pay/';
+					var obj=queryToObj();
+					var orderids=obj.orderids;
+					var username=obj.username;
+					if(orderids.indexOf('_')!==-1){
+						orderids=orderids.split("_")
+					}else{
+						orderids=[orderids]
+					};
+					if(location.href.indexOf('127.0.0.1')!==-1){
+						username='nvjan'
+					}
+					var data = {
+						pay_by: api,
+						username:username,
+						orders: JSON.stringify(orderids)
+					};
+					console.log(obj);
+					console.log(data);
+					ajaxfn(url,'POST','JSON',data,(res) => {
+						console.log(res);
+						var data = null;
+						if (res.result === 'ok') {
+							if(res.mweb_url){
+								location.href=res.mweb_url;
+								return;
+							};
+							if(def==='wx'){
+								this.qrcode_ctn={
+									hishow:true,
+									data:{
+										pay_by:api,
+										code_url:res.code_url,
+										pay_tag:'agent_delivery',
+										out_trade_no:res.trade_no
+									}
+								}
+								this.getQrcode();
+								this.getPaymentResult(api,res.trade_no);
+							}
+						}
+					})
+				},
+				getPaymentResult(pay_by,out_trade_no){
+					let data = {
+							out_trade_no
+						};
+					var src = '/order/daifa_callback/'+pay_by+'/';
+					ajaxfn(this.host+src, 'POST', 'json', data,(res) => {
+						if(res.result==='success' || this.qrcode_ctn.hishow!==true){
+							this.qrcode_ctn = {
+								data:{},
+								hishow:false
+							};
+							return
+						};
+						setTimeout(()=>{
+							this.getPaymentResult(pay_by,out_trade_no);
+						},2000);
+					})
+				},
+				initDatas() {
+					var {
+						orderids,
+						username
+					} = queryToObj();
+					var url = this.host+'/payment/get_order_infos/';
+					var data = {
+						orders: orderids,
+						username
+					};
+					ajaxfn(url,'POST','JSON',data,(res) => {
+						console.log(res);
+						var data = null;
+						if (res.result === 'success') {
+							data = res.data;
+							console.log(data);
+							console.log(this.gold);
+							// this.gold.available=data.goldcoin;
+							var goods = [];
+							
+							data.goods.forEach((item) => {
+								goods.push({
+									pic: 'https://data.aupool.cn' + item.img,
+									des: item.title,
+									price: item.price,
+									volumn: item.num,
+									unit: item.unit
+								})
+							})
+							// 生产环境,goods注释行打开
+							// this.goods = goods;
+							this.gold.available = 1000;
+							this.gold.transfer = 10;
+
+							this.coupon.volumn = 5;
+							this.coupon.price = 10;
+							this.coupon.limit = 1000;
+							if(data.goods.length===0){
+								alert('没有需要支付的订单！')
+							}
+						}
+					});
+				}
+			},
+			created() {
+				if (location.href.includes('localhost') || location.href.includes('127.0.0.1')) {
+					this.host = 'http://10.88.71.83:8008'
+				} else {
+					this.host = 'https://data.aupool.cn'
+				};
+				this.initDatas();
+			},
+			mounted() {
+				console.log('测试更新')
+			}
+		})
+	</script>
+</html>

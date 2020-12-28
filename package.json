@@ -1,0 +1,34 @@
+{
+  "name": "order_confirm_with_webpack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "qrcode.js",
+  "scripts": {
+    "dev": "webpack-dev-server",
+    "build": "webpack --config ./webpack.build.js",
+    "dev_test": "webpack --config ./webpack.config.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.11.5",
+    "@babel/preset-env": "^7.11.5",
+    "babel-loader": "^8.1.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^4.2.2",
+    "file-loader": "^6.1.0",
+    "html-webpack-plugin": "^4.4.1",
+    "less": "^3.12.2",
+    "less-loader": "^7.0.0",
+    "style-loader": "^1.2.1",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "core-js": "^2.6.11",
+    "install": "^0.13.0",
+    "jquery": "^3.5.1",
+    "npm": "^6.14.8"
+  }
+}

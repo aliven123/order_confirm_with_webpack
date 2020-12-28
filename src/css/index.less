@@ -1,0 +1,445 @@
+ul,
+li,
+body,
+html,
+h3,
+h5,
+p {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	height: 100%;
+	position: relative;
+}
+
+.fl {
+	float: left;
+	background: none;
+	border: none;
+}
+
+.fr {
+	float: right;
+	background: none;
+	border: none;
+}
+
+.boxs {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	/* Firefox */
+	-webkit-box-sizing: border-box;
+	/* Safari */
+}
+
+.clearfix:after {
+	content: "";
+	display: block;
+	visibility: hidden;
+	height: 0;
+	clear: both;
+}
+
+.border_btm {
+	border-bottom: 1px solid #bcbcbd;
+}
+
+/* 上面是公共样式 */
+h3 {
+	padding: 8px 4px;
+	color: #eb6100;
+	;
+}
+
+#main_ctn {
+	padding: 4px;
+}
+
+#main_ctn .need_state ul {
+	padding: 8px 4px;
+}
+
+#main_ctn .need_state li {
+	padding: 4px;
+	margin-right: 10px;
+	border: 1px solid white;
+	cursor: pointer;
+}
+
+#main_ctn .need_state li p {
+	height: 36px;
+}
+
+#main_ctn .need_state .active {
+	border: 1px solid #eb6100;
+}
+
+#main_ctn .need_state li textarea {
+	width: 220px;
+	resize: none;
+}
+#qrcode_ctn{
+	background:white;
+	width:170px;
+	height:215px;
+	position: fixed;
+	left:50%;
+	top:50%;
+	padding:10px;
+	transform:translate(-50%,-50%);
+	box-shadow: 0 0 5px black;
+}
+#qrcode_ctn .header{
+	color:#338af9;
+}
+#qrcode_ctn .header .close{
+	cursor: pointer;
+}
+#qrcode_ctn #qrcode{
+	margin-top:5px;
+}
+/* pc端样式 */
+#IsPC input[type=button] {
+	background: #338af9;
+	color: white;
+	border: none;
+	cursor: pointer;
+	padding: 4px;
+}
+
+#IsPC .center_ctn {
+	padding: 10px 0;
+}
+
+#IsPC .center_ctn .g_c_ctn {
+	padding: 10px 0;
+}
+
+#IsPC .center_ctn .gold input[type=text] {
+	width: 70px;
+}
+
+#IsPC .center_ctn .gold {
+	width: 260px;
+	padding: 8px;
+	text-align: center;
+}
+
+#IsPC .center_ctn .gold .use_gold {
+
+	margin-top: 4px;
+}
+
+#IsPC .center_ctn .gold span {
+	color: #eb6100;
+}
+
+#IsPC .center_ctn .gold>p {
+	margin-bottom: 8px;
+}
+
+#IsPC .center_ctn .coupon {
+	width: 230px;
+	padding: 8px;
+	text-align: center;
+	border-left: 1px solid #bcbcbd;
+	border-right: 1px solid #bcbcbd;
+
+}
+
+#IsPC .center_ctn .coupon .coupon_ctn {
+	width: 95px;
+	margin: 0 auto;
+	padding: 5px;
+	background: #eb6100;
+	color: white;
+}
+
+
+#IsPC .center_ctn .coupon>p,
+#IsPC .center_ctn .coupon>div {
+	margin-top: 8px;
+}
+
+#IsPC .center_ctn .message {
+	text-align: center;
+	padding: 8px;
+}
+
+#IsPC .center_ctn .message>p {
+	margin-bottom: 8px;
+}
+
+#IsPC .center_ctn .message textarea {
+	resize: none;
+	width: 120px;
+	height: 80px;
+}
+
+#IsPC .center_ctn .order_ctn {
+	padding: 10px 4px;
+	display: -webkit-flex;
+	display: -webkit-flex;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-around;
+	align-items: flex-start;
+}
+
+#IsPC .center_ctn .order_ctn .goods {
+	flex: 1;
+	max-height: 320px;
+	overflow: auto;
+	margin-right: 20px;
+}
+
+#IsPC .center_ctn .order_ctn .goods li {
+	margin-bottom: 10px;
+	display: -webkit-flex;
+	display: -webkit-flex;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
+
+#IsPC .center_ctn .order_ctn .goods li>div {
+	margin-right: 10px;
+}
+
+#IsPC .center_ctn .order_ctn .goods .pic {
+	width: 150px;
+}
+
+#IsPC .center_ctn .order_ctn .goods .pic img {
+	display: inline-block;
+	width: 100%;
+}
+
+#IsPC .center_ctn .order_ctn .goods li .des {
+	width: 200px;
+}
+
+#IsPC .center_ctn .order_ctn .goods li .price_num {
+	flex: 1;
+	text-align: right;
+	color: #eb6100;
+}
+
+#IsPC .center_ctn .order_ctn .orders_details {
+	margin-right: 50px;
+}
+
+#IsPC .invoice {
+	min-width: 360px;
+	margin-bottom: 10px;
+}
+
+#IsPC .invoice>div {
+	margin-bottom: 4px;
+}
+
+#IsPC .invoice .ipt_ctn {
+	display: -webkit-flex;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-items: center;
+	margin-top: 4px;
+}
+
+#IsPC .invoice .des {
+	display: inline-block;
+	width: 114px;
+}
+
+#IsPC .invoice .ipt_ctn input {
+	flex: 1;
+}
+
+#IsPC .invoice>p {
+	font-size: 14px;
+	color: gray;
+	margin-top: 4px;
+}
+
+#IsPC .bills {
+	border-top: 1px solid #bcbcbd
+}
+
+#IsPC .bills li {
+	margin-bottom: 4px;
+}
+
+#IsPC .bills .tips {
+	margin: 8px 0;
+	font-size: 14px;
+	color: gray;
+}
+
+#IsPC .bills li .des {
+	display: inline-block;
+	text-align: left;
+	width: 110px;
+}
+
+#IsPC .bills li .val {
+	color: #eb6100;
+}
+
+#IsPC .bills .total_ctn {
+	margin-top: 10px;
+	padding: 4px;
+	border: 1px solid #bcbcbd;
+}
+
+#IsPC .bills .total_ctn .action {
+	padding: 5px;
+	cursor: pointer;
+}
+
+#IsPC .bills .total_ctn .action .payment_order {
+	background: #338af9;
+	color: white;
+	padding: 4px;
+}
+
+/* 移动端样式 */
+#IsPhone {
+	padding: 0 4px;
+}
+
+#IsPhone .goods_count .val {
+	color: #eb6100;
+}
+
+#IsPhone .goods {
+	width: 100%;
+	border-bottom: 1px solid #bcbcbd;
+	padding: 4px 0;
+	display: -webkit-flex;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+#IsPhone .goods>.pic {
+	width: 20%;
+	height: 100%; padding:10px;
+}
+
+#IsPhone .goods>.pic img {
+	display: inline-block;
+	max-width: 100%;
+	max-height: 100%;
+}
+
+#IsPhone .gold .checkbox_ctn {
+	text-align: right;
+}
+
+#IsPhone .gold,
+#IsPhone .coupon,
+#IsPhone .invoice,
+#IsPhone .bills {
+	margin-top: 12px;
+}
+
+#IsPhone .coupon i {
+	font-style: normal;
+	font-size: 14px;
+	color: gray;
+}
+
+#IsPhone .invoice {
+	border-top: 1px solid #bcbcbd;
+	border-bottom: 1px solid #bcbcbd;
+	padding: 4px 0;
+}
+
+#IsPhone .invoice .ipt_ctn {
+	display: -webkit-flex;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-items: center;
+	margin-top: 4px;
+}
+
+#IsPhone .invoice .des {
+	display: inline-block;
+	width: 114px;
+}
+
+#IsPhone .invoice .ipt_ctn input {
+	flex: 1;
+}
+
+#IsPhone .invoice>p {
+	font-size: 14px;
+	color: gray;
+	margin-top: 4px;
+}
+
+#IsPhone .gold .val,
+#IsPhone .coupon .val,
+#IsPhone .invoice .val {
+	color: #eb6100;
+}
+
+#IsPhone .seperate {
+	height: 50px;
+}
+
+#IsPhone .bills li {
+	margin-bottom: 4px;
+}
+
+#IsPhone .bills .tips {
+	margin: 8px 0;
+	font-size: 14px;
+	color: gray;
+}
+
+#IsPhone .bills li .des {
+	display: inline-block;
+	text-align: left;
+	width: 110px;
+}
+
+#IsPhone .bills li .val {
+	color: #eb6100;
+}
+
+#IsPhone .bills .total_ctn {
+	padding: 4px;
+	border-top: 1px solid #bcbcbd;
+	width: 100%;
+	background: white;
+	position: fixed;
+	left: 50%;
+	bottom: -4px;
+	transform: translate(-50%);
+	box-shadow: 0 0 4px gray;
+}
+
+#IsPhone .bills .total_ctn .action {
+	padding: 5px;
+	cursor: pointer;
+}
+
+#IsPhone .bills .total_ctn .action {
+	padding: 5px;
+	cursor: pointer;
+}
+
+#IsPhone .bills .total_ctn .action .payment_order {
+	background: #338af9;
+	color: white;
+	padding: 4px;
+}
+	

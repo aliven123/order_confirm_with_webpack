@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+		<title>确认订单</title>
+		<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+	</head>
+	<body>
+		<div id="main_ctn" class="boxs">
+			<h3 class="boxs border_btm">确认订单</h3>
+			<div id="qrcode_ctn" v-if="qrcode_ctn.hishow">
+				<div class="clearfix boxs header">
+					<span class="fl">微信扫码支付</span>
+					<span class="fr close" @click="closeQrcode">
+						关闭
+					</span>
+				</div>
+				<div id="qrcode"></div>
+				<p></p>
+			</div>
+			<template v-if="IsPC===true">
+				<!-- pc端 -->
+				<div class="need_state boxs border_btm">
+					<ul class="boxs clearfix">
+						<li v-for="(item,name) in need_state.menus" class="fl boxs" :class="{active:name===need_state.def}" @click="handleNeedstate(name)">
+							<h4 v-text="item.txt"></h4>
+							<template v-if="name==='not_delivery'">
+								<p v-text="item.val"></p>
+							</template>
+							<template v-else>
+								<textarea :style="{'width':IsPC?'402px':'220px'}" cols="3" placeholder="在这里输入收货地址 " v-model.trim="item.val">
+								</textarea>
+							</template>
+						</li>
+					</ul>
+				</div>
+				<div id="IsPC">
+					<div class="center_ctn boxs">
+						<!--金币和优惠券模块 -->
+						<div class="g_c_ctn border_btm clearfix">
+							<div class="gold boxs fl">
+								<p>可用金币<span>{{gold.available}}</span>（{{gold.transfer}}金币=¥1）</p>
+								<div>
+									<label>
+										使用金币
+										<input type="checkbox" v-model="gold.use_switch" />
+									</label>
+									<input type="number" min="0" max="100000000" placeholder="输金币数量" v-model.trim="gold.use_volumn">
+								</div>
+								<p class="use_gold">
+									已使用金币<span v-text="gold.use_volumn">0</span>个,
+									可抵扣<span>{{Golddeduct | RMB_symbol}}</span>
+								</p>
+							</div>
+							<div class="coupon boxs fl">
+								<div class="coupon_ctn">{{coupon.price | RMB_symbol}}</div>
+								<p>
+									优惠券{{coupon.volumn}}张
+									<label>
+										使用优惠券
+										<input type="checkbox" v-model="coupon.use_switch" />
+									</label>
+								</p>
+								<p>
+									使用
+									<input type="number" min="0" style="width:30px" v-model="coupon.use_volumn">
+									张，可抵扣{{coupon_deduct | RMB_symbol}}
+								</p>
+								<p>满{{coupon.limit | RMB_symbol}}可用</p>
+
+							</div>
+							<div class="message boxs fl">
+								<p>给商家留言</p>
+								<textarea rows="" cols="" v-model.trim="message">
+								</textarea>
+							</div>
+						</div>
+						<!-- 订单发票，对账单模块 -->
+						<div class="order_ctn boxs">
+							<ul class="goods boxs">
+								<li v-for="(item,index) in goods" :key="index" class="border_btm">
+									<div class="pic">
+										<img :src="item.pic">
+									</div>
+									<div class="des">{{item.des}}</div>
+									<div class="price_num">
+										<p>{{item.price | RMB_symbol}}</p>
+										<p>x{{item.volumn}}({{item.unit}})</p>
+									</div>
+								</li>
+							</ul>
+							<div class="orders_details boxs">
+								<div class="invoice boxs">
+									<div class="clearfix">
+										<span class="fl">发票（税率{{invoice.rate}}%）</span>
+										<label class="fr">
+											<span>发票</span>
+											<input type="checkbox" v-model="invoice.use_switch">
+										</label>
+									</div>
+									<template v-if="invoice.use_switch===true">
+										<div class="ipt_ctn boxs">
+											<span class="des">抬头：</span>
+											<input type="text" placeholder="请输入发票抬头">
+										</div>
+										<div class="ipt_ctn boxs">
+											<span class="des">纳税人识别号：</span>
+											<input type="text" placeholder="请输入纳税人识别号">
+										</div>
+										<div class="ipt_ctn boxs">
+											<span class="des">发票备注：</span>
+											<input type="text" placeholder="发票备注" v-model="invoice.msg">
+										</div>
+										<p>注：个人类型无需填写纳税人识别号</p>
+									</template>
+								</div>
+								<ul class="bills">
+									<li>
+										<span class="des">商品{{total_obj.volumn}}件，总计</span>
+										<span class="val">{{total_obj.price | RMB_symbol}}</span>
+									</li>
+									<li class="tips">
+										<span>使用优惠/金币/费用</span>
+									</li>
+									<li v-for="(item,name) in bills">
+										<span class="des">{{item.txt}}{{item.c_mode}}</span>
+										<span class="val">{{item.val | RMB_symbol}}</span>
+									</li>
+									<li class="clearfix total_ctn">
+										<div class="fl" style="line-height: 31px;">
+											<span>实付</span>
+											<span class="val">{{needPayment() | RMB_symbol}}</span>
+										</div>
+										<div class="fr action">
+											<span>
+												<label>
+													微信
+													<input type="radio" value="wx" v-model="payment.def">
+												</label>
+												<label>
+													支付宝
+													<input type="radio" value="zfb" v-model="payment.def">
+												</label>
+											</span>
+											<span class="payment_order" @click="handlePayment">
+												提交订单
+											</span>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</template>
+			<template v-else>
+
+				<div id="IsPhone">
+					<div class="boxs clearfix goods_count">
+						<span class="time fl">{{date_now}}</span>
+						<div class="fr boxs">
+							总额<span class="val">{{total_obj.price | RMB_symbol}}</span>
+							共<span class="val">{{total_obj.volumn}}</span>件&nbsp;
+						</div>
+					</div>
+					<div class="goods boxs">
+						<div class="pic boxs" v-for="(item,index) in goods" :key="index">
+							<img :src="item.pic">
+						</div>
+					</div>
+					<div class="need_state boxs border_btm">
+						<ul class="boxs clearfix">
+							<li v-for="(item,name) in need_state.menus" class="fl boxs" :class="{active:name===need_state.def}" @click="handleNeedstate(name)">
+								<h4 v-text="item.txt"></h4>
+								<template v-if="name==='not_delivery'">
+									<p v-text="item.val"></p>
+								</template>
+								<template v-else>
+									<textarea :style="{'width':IsPC?'402px':'220px'}" cols="3" placeholder="在这里输入收货地址 " v-model.trim="item.val">
+									</textarea>
+								</template>
+							</li>
+						</ul>
+					</div>
+					<div class="gold boxs">
+						<p class="clearfix">
+							<span class="fl">金币：<span class="val">{{gold.available}}个</span></span>
+							<span class="fr">（{{gold.transfer}}金币=¥1）</span>
+						</p>
+						<p class="use_gold clearfix">
+							<div class="fl">
+								<label>
+									使用金币
+								</label>
+								<input type="number" min="0" max="100000000" placeholder="输金币数量" v-model.trim="gold.use_volumn">个，
+							</div>
+							<div>
+								可抵扣<span>{{Golddeduct | RMB_symbol}}</span>
+							</div>
+						</p>
+						<p class="checkbox_ctn">
+							<label>
+								使用金币
+								<input type="checkbox" v-model="gold.use_switch" />
+							</label>
+						</p>
+					</div>
+					<div class="coupon boxs">
+						<div class="clearfix">
+							优惠券：<span class="val">{{coupon.volumn}}张</span>
+							<span class="fr">
+								（{{coupon.price | RMB_symbol}}）
+							</span>
+						</div>
+						<div class="clearfix">
+							<span class="fl">
+								使用
+								<input type="number" min="0" style="width:25px" v-model="coupon.use_volumn">
+								张，可抵扣{{coupon_deduct | RMB_symbol}}
+							</span>
+							<label class="fr">
+								使用优惠券
+								<input type="checkbox" v-model="coupon.use_switch" />
+							</label>
+						</div>
+						<i>注：满{{coupon.limit | RMB_symbol}}可用</i>
+					</div>
+					<div class="invoice boxs">
+						<div class="clearfix">
+							发票税率：<span class="val">{{invoice.rate}}%</span>
+							<label class="fr">
+								<span>发票</span>
+								<input type="checkbox" v-model="invoice.use_switch">
+							</label>
+						</div>
+						<!-- <template v-if="invoice.use_switch===true"> -->
+						<template>
+							<div class="ipt_ctn boxs">
+								<span class="des">抬头：</span>
+								<input type="text" placeholder="请输入发票抬头">
+							</div>
+							<div class="ipt_ctn boxs">
+								<span class="des">纳税人识别号：</span>
+								<input type="text" placeholder="请输入纳税人识别号">
+							</div>
+							<div class="ipt_ctn boxs">
+								<span class="des">发票备注：</span>
+								<input type="text" placeholder="发票备注" v-model="invoice.msg">
+							</div>
+							<p>注：个人类型无需填写纳税人识别号</p>
+						</template>
+					</div>
+					<ul class="bills boxs">
+						<li class="tips">
+							<span>使用优惠/金币/费用：</span>
+						</li>
+						<li v-for="(item,name) in bills">
+							<span class="des">{{item.txt}}{{item.c_mode}}</span>
+							<span class="val">{{item.val | RMB_symbol}}</span>
+						</li>
+						<li class="seperate"></li>
+						<li class="clearfix total_ctn boxs">
+							<div class="fl" style="line-height: 31px;">
+								<span>实付</span>
+								<span class="val">{{needPayment() | RMB_symbol}}</span>
+							</div>
+							<div class="fr action">
+								<span>
+									<label>
+										微信
+										<input type="radio" value="wx" v-model="payment.def">
+									</label>
+									<label>
+										支付宝
+										<input type="radio" value="zfb" v-model="payment.def">
+									</label>
+								</span>
+								<span class="payment_order" @click="handlePayment">
+									提交订单
+								</span>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</template>
+		</div>
+	</body>
+</html>
