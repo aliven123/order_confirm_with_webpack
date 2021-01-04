@@ -1,6 +1,7 @@
 // import QRCode from '../assets/qrcode.js';
 import {ajaxfn,queryToObj,IsPC,dataNow} from '../assets/utils.js';
 import '../css/index.less';
+import '../assets/iconfont/iconfont.css';
 var vm = new Vue({
 	el: '#main_ctn',
 	data: {
@@ -28,19 +29,19 @@ var vm = new Vue({
 			available: 10000, //可用金币
 			use_volumn: 0, //使用金币的数量
 			transfer: 100,
-			use_switch: true
+			use_switch: false
 		},
 		coupon: { //优惠券
 			volumn: 1, //张数
 			use_volumn: 0, //使用的张数
 			price: 100, //优惠券面值
 			limit: 1000, //满多少可用
-			use_switch: true
+			use_switch: false
 		},
 		message: '', //给商家留言
 		goods: [
 			//商品列表
-			{
+			/* {
 				pic: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1608285375145&di=f2ea0757f094aea4b8e71059d4aa9d84&imgtype=0&src=http%3A%2F%2Fattach.bbs.miui.com%2Fforum%2F201303%2F16%2F075154gfxiljfvfidzfcvt.jpg',
 				des: '豪华企业网站标准版豪华企业网站标准版',
 				price: '465',
@@ -57,11 +58,11 @@ var vm = new Vue({
 				des: '豪华企业网站标准版豪华企业网站标准版',
 				price: '1111',
 				volumn: '1'
-			}
+			} */
 		],
 		invoice: {
-			rate: 3,
-			use_switch: true,
+			rate: 0,
+			use_switch: false,
 			head: '',
 			tax_id: '',
 			msg: ''
@@ -226,9 +227,13 @@ var vm = new Vue({
 			var def = this.payment.def;
 			var api = this.payment[def].api;
 			var url = this.host + '/order/daifa_pay/';
-			var obj = queryToObj();
-			var orderids = obj.orderids;
-			var username = obj.username;
+			let {orderids,username,from_url} = queryToObj();
+			console.log(from_url);
+			if(from_url && from_url.includes('e_t_r')){
+				from_url=from_url.replace(/\[a_t_r\]/g,'&');
+				from_url=from_url.replace(/\[e_t_r\]/g,'=');
+			};
+			console.log(from_url);
 			if (orderids.indexOf('_') !== -1) {
 				orderids = orderids.split("_")
 			} else {
@@ -236,20 +241,28 @@ var vm = new Vue({
 			};
 			if (location.href.indexOf('127.0.0.1') !== -1) {
 				username = 'nvjan'
+			};
+			const order_info={
+				gold:this.gold,
+				coupon:this.coupon,
+				goods:this.goods,
+				invoice:this.invoice
 			}
 			var data = {
 				pay_by: api,
 				username: username,
-				orders: JSON.stringify(orderids)
+				orders: JSON.stringify(orderids),
+				order_info:JSON.stringify(order_info),
+				message:this.message
 			};
-			console.log(obj);
+			if(def==='zfb'){Object.assign(data,{from_url})};
 			console.log(data);
 			ajaxfn(url, 'POST', 'JSON', data, (res) => {
 				console.log(res);
 				var data = null;
 				if (res.result === 'ok') {
-					if (res.mweb_url) {
-						location.href = res.mweb_url;
+					if (res.mweb_url||res.url) {
+						location.href = res.mweb_url||res.url;
 						return;
 					};
 					if (def === 'wx') {
@@ -263,12 +276,14 @@ var vm = new Vue({
 							}
 						}
 						this.getQrcode();
-						this.getPaymentResult(api, res.trade_no);
+						this.getPaymentResult(api, res.trade_no,from_url);
 					}
+				}else{
+					alert(res.reason)
 				}
 			})
 		},
-		getPaymentResult(pay_by, out_trade_no) {
+		getPaymentResult(pay_by, out_trade_no,from_url) {
 			let data = {
 				out_trade_no
 			};
@@ -279,12 +294,24 @@ var vm = new Vue({
 						data: {},
 						hishow: false
 					};
+					if(res.result === 'success' && from_url){
+						window.open(from_url,'_self');
+					}
 					return
 				};
 				setTimeout(() => {
-					this.getPaymentResult(pay_by, out_trade_no);
+					this.getPaymentResult(pay_by, out_trade_no,from_url);
 				}, 2000);
 			})
+		},
+		handleGoBack(){
+			let {from_url} = queryToObj();
+			console.log(from_url);
+			if(from_url && from_url.includes('e_t_r')){
+				from_url=from_url.replace(/\[a_t_r\]/g,'&');
+				from_url=from_url.replace(/\[e_t_r\]/g,'=');
+			};
+			window.open(from_url,'_self');
 		},
 		initDatas() {
 			var {
@@ -298,17 +325,15 @@ var vm = new Vue({
 			};
 			ajaxfn(url, 'POST', 'JSON', data, (res) => {
 				console.log(res);
-				var data = null;
 				if (res.result === 'success') {
-					data = res.data;
-					console.log(data);
+					let {goods,gold,coupon,tax_rate} = res.data;
 					console.log(this.gold);
 					// this.gold.available=data.goldcoin;
-					var goods = [];
+					var good_arr = [];
 
-					data.goods.forEach((item) => {
-						goods.push({
-							pic: 'https://data.aupool.cn' + item.img,
+					goods.forEach((item) => {
+						good_arr.push({
+							pic: 'https://362965b2f6.picp.vip' + item.img,
 							des: item.title,
 							price: item.price,
 							volumn: item.num,
@@ -316,14 +341,23 @@ var vm = new Vue({
 						})
 					})
 					// 生产环境,goods注释行打开
-					// this.goods = goods;
-					this.gold.available = 1000;
-					this.gold.transfer = 10;
+					this.goods = good_arr;
+					
+					/* this.gold.available = 1000;
+					this.gold.transfer = 1;
 
 					this.coupon.volumn = 5;
 					this.coupon.price = 10;
-					this.coupon.limit = 1000;
-					if (data.goods.length === 0) {
+					this.coupon.limit = 1000; */
+					this.gold.available=gold.available;
+					this.gold.transfer=gold.transfer;
+					
+					this.coupon.volumn = coupon.volumn;
+					this.coupon.price = coupon.price;
+					this.coupon.limit = coupon.limit;
+					
+					this.invoice.rate=tax_rate*100;
+					if (goods.length === 0) {
 						alert('没有需要支付的订单！')
 					}
 				}
@@ -339,6 +373,6 @@ var vm = new Vue({
 		this.initDatas();
 	},
 	mounted() {
-		console.log('测试更新')
+		// console.log('测试更新')
 	}
 })

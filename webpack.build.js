@@ -9,7 +9,8 @@ module.exports={
 	},
 	output:{
 		filename:'js/[name].js',
-		path:path.resolve(__dirname,'./dist')
+		path:path.resolve(__dirname,'./dist'),
+		chunkFilename:'js/chunk_[name].js'
 	},
 	externals:{
 		'Vue':'Vue',

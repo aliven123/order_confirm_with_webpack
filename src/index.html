@@ -9,12 +9,14 @@
 	</head>
 	<body>
 		<div id="main_ctn" class="boxs">
-			<h3 class="boxs border_btm">确认订单</h3>
+			<h3 class="boxs border_btm">
+				<span class="go_back iconfont iconfanhui" @click="handleGoBack">返回</span>
+				<span>确认订单</span>
+			</h3>
 			<div id="qrcode_ctn" v-if="qrcode_ctn.hishow">
 				<div class="clearfix boxs header">
 					<span class="fl">微信扫码支付</span>
-					<span class="fr close" @click="closeQrcode">
-						关闭
+					<span class="fr close iconfont iconguanbi" @click="closeQrcode">
 					</span>
 				</div>
 				<div id="qrcode"></div>
@@ -22,7 +24,7 @@
 			</div>
 			<template v-if="IsPC===true">
 				<!-- pc端 -->
-				<div class="need_state boxs border_btm">
+				<!-- <div class="need_state boxs border_btm">
 					<ul class="boxs clearfix">
 						<li v-for="(item,name) in need_state.menus" class="fl boxs" :class="{active:name===need_state.def}" @click="handleNeedstate(name)">
 							<h4 v-text="item.txt"></h4>
@@ -35,7 +37,7 @@
 							</template>
 						</li>
 					</ul>
-				</div>
+				</div> -->
 				<div id="IsPC">
 					<div class="center_ctn boxs">
 						<!--金币和优惠券模块 -->
@@ -103,15 +105,15 @@
 									<template v-if="invoice.use_switch===true">
 										<div class="ipt_ctn boxs">
 											<span class="des">抬头：</span>
-											<input type="text" placeholder="请输入发票抬头">
+											<input type="text" placeholder="请输入发票抬头" v-model.trim="invoice.head">
 										</div>
 										<div class="ipt_ctn boxs">
 											<span class="des">纳税人识别号：</span>
-											<input type="text" placeholder="请输入纳税人识别号">
+											<input type="text" placeholder="请输入纳税人识别号" v-model.trim="invoice.tax_id">
 										</div>
 										<div class="ipt_ctn boxs">
 											<span class="des">发票备注：</span>
-											<input type="text" placeholder="发票备注" v-model="invoice.msg">
+											<input type="text" placeholder="发票备注" v-model.trim="invoice.msg">
 										</div>
 										<p>注：个人类型无需填写纳税人识别号</p>
 									</template>
@@ -170,7 +172,7 @@
 							<img :src="item.pic">
 						</div>
 					</div>
-					<div class="need_state boxs border_btm">
+					<!-- <div class="need_state boxs border_btm">
 						<ul class="boxs clearfix">
 							<li v-for="(item,name) in need_state.menus" class="fl boxs" :class="{active:name===need_state.def}" @click="handleNeedstate(name)">
 								<h4 v-text="item.txt"></h4>
@@ -183,6 +185,12 @@
 								</template>
 							</li>
 						</ul>
+					</div> -->
+					
+					<div class="message boxs">
+						<p>给商家留言</p>
+						<textarea rows="" cols="" v-model.trim="message" class="boxs">
+						</textarea>
 					</div>
 					<div class="gold boxs">
 						<p class="clearfix">
@@ -239,15 +247,23 @@
 						<template>
 							<div class="ipt_ctn boxs">
 								<span class="des">抬头：</span>
-								<input type="text" placeholder="请输入发票抬头">
+								<input type="text"
+								 placeholder="请输入发票抬头"
+								 v-model.trim="invoice.head"
+								>
 							</div>
 							<div class="ipt_ctn boxs">
 								<span class="des">纳税人识别号：</span>
-								<input type="text" placeholder="请输入纳税人识别号">
+								<input type="text"
+								 placeholder="请输入纳税人识别号"
+								 v-model.trim="invoice.tax_id"
+								>
 							</div>
 							<div class="ipt_ctn boxs">
 								<span class="des">发票备注：</span>
-								<input type="text" placeholder="发票备注" v-model="invoice.msg">
+								<input type="text" placeholder="发票备注"
+								 v-model.trim="invoice.msg"
+								>
 							</div>
 							<p>注：个人类型无需填写纳税人识别号</p>
 						</template>
