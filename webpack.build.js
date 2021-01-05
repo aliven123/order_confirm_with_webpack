@@ -53,6 +53,15 @@ module.exports={
 			},{
 				loader:'less-loader'
 			}]
+		},{
+			test: /\.(eot|ttf|svg|woff)$/,
+			use: {
+				loader: 'file-loader',
+				options: {
+					name: '[name].[ext]',
+					outputPath: 'images/'
+				}
+			}
 		}]
 	},
 	plugins: [
