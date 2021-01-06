@@ -1,3 +1,14 @@
+@green:#57993d;
+@hvgreen:#7bd25f;
+@blue:#3d5b99;
+@hvblue:#67b8f2;
+@red:#993d3d;
+@hvred:#e46a5e;
+@gray:#333333;
+@hvgray:#3d5b99;
+@yellow:#eb9506;
+@submenugray:#4e4e4e;
+@hvsubmenublue:#338af9;
 ul,
 li,
 body,
@@ -56,7 +67,7 @@ h3 {
 		cursor: pointer;
 		margin-right: 10px;
 		&:hover{
-			color:#338af9;
+			color:@hvsubmenublue;
 		}
 	}
 }
@@ -100,7 +111,7 @@ h3 {
 	box-shadow: 0 0 5px black;
 }
 #qrcode_ctn .header{
-	color:#338af9;
+	color:@hvsubmenublue;
 }
 #qrcode_ctn .header .close{
 	cursor: pointer;
@@ -110,7 +121,7 @@ h3 {
 }
 /* pc端样式 */
 #IsPC input[type=button] {
-	background: #338af9;
+	background: @hvsubmenublue;
 	color: white;
 	border: none;
 	cursor: pointer;
@@ -215,6 +226,17 @@ h3 {
 
 #IsPC .center_ctn .order_ctn .goods li>div {
 	margin-right: 10px;
+	.desc{
+		color:@hvsubmenublue;
+	}
+	.wrapper{
+		margin-top: 6px;
+	}
+	i{
+		color:#eb6100;
+		font-size: 14px;
+		font-style: normal;
+	}
 }
 
 #IsPC .center_ctn .order_ctn .goods .pic {
@@ -290,7 +312,7 @@ h3 {
 #IsPC .bills li .des {
 	display: inline-block;
 	text-align: left;
-	width: 110px;
+	width: 126px;
 }
 
 #IsPC .bills li .val {
@@ -309,7 +331,7 @@ h3 {
 }
 
 #IsPC .bills .total_ctn .action .payment_order {
-	background: #338af9;
+	background: @hvsubmenublue;
 	color: white;
 	padding: 4px;
 }
@@ -332,6 +354,19 @@ h3 {
 	flex-flow: row wrap;
 	justify-content: flex-start;
 	align-items: center;
+	.orders_wrapper{
+		>div{
+			margin-top:4px;
+			i{
+				font-style: normal;
+				color:#EB6100;
+				font-size: 14px;
+			}
+		}
+		.desc{
+			color:@hvsubmenublue;
+		}
+	}
 }
 
 #IsPhone .goods>.pic {
@@ -427,7 +462,7 @@ h3 {
 #IsPhone .bills li .des {
 	display: inline-block;
 	text-align: left;
-	width: 110px;
+	width: 126px;
 }
 
 #IsPhone .bills li .val {

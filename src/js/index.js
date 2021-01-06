@@ -7,6 +7,7 @@ var vm = new Vue({
 	data: {
 		host: '',
 		IsPC,
+		orders:{period:12},//{非空对象},说明是正常下单状态；否则,是一键代发状态
 		qrcode_ctn: {
 			hishow: false,
 			data: {}
@@ -105,16 +106,48 @@ var vm = new Vue({
 		}
 	},
 	computed: {
-		total_obj() {
-			return this.goods.reduce((obj, item) => {
-				return {
-					price: obj.price + item.price * item.volumn,
-					volumn: obj.volumn + Number.parseInt(item.volumn)
+		order_price(){
+			this.initOrders();
+			const {discount_price,indic_price}=this.orders;
+			const obj={des:'',val:'',dis_val:'false'};
+			// dis_val不为'false'时显示，引导用户
+			console.log(indic_price);
+			if(indic_price!==undefined){
+				console.log(indic_price);
+				obj.val=indic_price;
+				if(discount_price==='false'){
+					// 没有折扣
+					obj.des='单价（元/月）:';
+					obj.dis_val=indic_price*0.9.toFixed(2);
+				}else{
+					obj.des='会员折扣单价（元/月）：';
+					obj.val=discount_price;
 				}
-			}, {
-				price: 0,
-				volumn: 0
-			})
+			};
+			console.log(this.orders);
+			console.log(obj);
+			return obj;
+		},
+		total_obj() {
+			if(this.indic_name===undefined){
+				// 正常下单的商品数量和总计
+				return {
+					price: this.order_price.val*this.orders.period,
+					volumn: this.orders.period
+				}
+			}else{
+				// 代发的商品数量和总计
+				return this.goods.reduce((obj, item) => {
+					return {
+						price: obj.price + item.price * item.volumn,
+						volumn: obj.volumn + Number.parseInt(item.volumn)
+					}
+				}, {
+					price: 0,
+					volumn: 0
+				})
+			}
+			
 		},
 		Golddeduct() {
 			//金币抵扣
@@ -215,6 +248,27 @@ var vm = new Vue({
 		closeQrcode() {
 			this.qrcode_ctn.hishow = false;
 		},
+		mergeOrderData(data){
+			// 普通下单需要数据和接口
+			const {SecurityID,indic_name,indic_type,period}=this.orders;
+			
+			//代发的接口
+			let url=this.host + '/order/daifa_pay/';
+			if(indic_name){
+				Object.assign(data,{
+					SecurityID,
+					indicname:indic_name,
+					indic_type,
+					buy_time:period,
+					api:0,//下单时api是0
+					// p_single_code:''
+				});
+				
+				//正常下单的接口
+				url=`${this.host}/payment/pay/`;
+			};
+			return url;
+		},
 		handlePayment() {
 			// if(this.needPayment()===0){return};
 			if (this.qrcode_ctn.hishow) {
@@ -226,7 +280,7 @@ var vm = new Vue({
 			}
 			var def = this.payment.def;
 			var api = this.payment[def].api;
-			var url = this.host + '/order/daifa_pay/';
+			var url;
 			let {orderids,username,from_url} = queryToObj();
 			console.log(from_url);
 			if(from_url && from_url.includes('e_t_r')){
@@ -246,8 +300,9 @@ var vm = new Vue({
 				gold:this.gold,
 				coupon:this.coupon,
 				goods:this.goods,
-				invoice:this.invoice
-			}
+				invoice:this.invoice,
+				api:1//代发api是1
+			};
 			var data = {
 				pay_by: api,
 				username: username,
@@ -255,8 +310,8 @@ var vm = new Vue({
 				order_info:JSON.stringify(order_info),
 				message:this.message
 			};
+			url=this.mergeOrderData(data);
 			if(def==='zfb'){Object.assign(data,{from_url})};
-			console.log(data);
 			ajaxfn(url, 'POST', 'JSON', data, (res) => {
 				console.log(res);
 				var data = null;
@@ -313,16 +368,36 @@ var vm = new Vue({
 			};
 			window.open(from_url,'_self');
 		},
-		initDatas() {
+		initOrders(){
 			var {
 				orderids,
-				username
+				username,
+				SecurityID,
+				indic_name,
+				indic_type,
+				indic_price,
+				discount_price
 			} = queryToObj();
+			if(orderids==='false'){
+				// orderids==='false',说明是普通下单的情况
+				Object.assign(this.orders,{
+					SecurityID:decodeURI(SecurityID),
+					indic_name:decodeURI(indic_name),
+					indic_type:decodeURI(indic_type),
+					indic_price,
+					discount_price
+				})
+			};
+			return {username,orderids}
+		},
+		initDatas() {
+			const {orderids,username}=this.initOrders();
 			var url = this.host + '/payment/get_order_infos/';
 			var data = {
 				orders: orderids,
 				username
 			};
+			console.log(this.orders)
 			ajaxfn(url, 'POST', 'JSON', data, (res) => {
 				console.log(res);
 				if (res.result === 'success') {
@@ -357,7 +432,7 @@ var vm = new Vue({
 					this.coupon.limit = coupon.limit;
 					
 					this.invoice.rate=tax_rate*100;
-					if (goods.length === 0) {
+					if (goods.length === 0&&orderids!=='false') {
 						alert('没有需要支付的订单！')
 					}
 				}

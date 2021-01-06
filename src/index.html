@@ -92,6 +92,50 @@
 										<p>x{{item.volumn}}({{item.unit}})</p>
 									</div>
 								</li>
+								
+								<li v-if="orders.indic_name!==undefined">
+									<div>
+										<span class="desc">策略名:</span>
+										<span>{{orders.indic_name}}</span>
+									</div>
+									<div>
+										<span class="desc">策略类型:</span>
+										<span>{{orders.indic_type}}</span>
+									</div>
+									<div>
+										<span class="desc">策略标的:</span>
+										<span>{{orders.SecurityID}}</span>
+									</div>
+									<div>
+										<span class="desc">
+											{{order_price.des}}
+										</span>
+										<span>{{order_price.val | RMB_symbol}} 
+											<i>(当前订单价格)</i>
+										</span>
+									</div>
+								</li>
+								<li v-if="orders.indic_name!==undefined">
+									<div>
+										<p v-if="order_price.dis_val!=='false'" class="wrapper">
+											<span class="desc">
+												会员折扣单价(元/月)：
+											</span>
+											<span>{{order_price.dis_val | RMB_symbol}}</span>
+										</p>
+										<p class="wrapper">
+											<span class="desc">
+												购买周期(月):
+											</span>
+											<span>
+												<input type="number"
+												 v-model="orders.period"
+												 min="1"
+												>
+											</span>
+										</p>
+									</div>
+								</li>
 							</ul>
 							<div class="orders_details boxs">
 								<div class="invoice boxs">
@@ -170,6 +214,45 @@
 					<div class="goods boxs">
 						<div class="pic boxs" v-for="(item,index) in goods" :key="index">
 							<img :src="item.pic">
+						</div>
+						<div class="orders_wrapper" v-if="orders.indic_name!==undefined">
+							<div>
+								<span class="desc">策略名:</span>
+								<span>{{orders.indic_name}}</span>
+							</div>
+							<div>
+								<span class="desc">策略类型:</span>
+								<span>{{orders.indic_type}}</span>
+							</div>
+							<div>
+								<span class="desc">策略标的:</span>
+								<span>{{orders.SecurityID}}</span>
+							</div>
+							<div>
+								<span class="desc">
+									{{order_price.des}}
+								</span>
+								<span>{{order_price.val | RMB_symbol}} 
+									<i>(当前订单价格)</i>
+								</span>
+							</div>
+							<div v-if="order_price.dis_val!=='false'">
+								<span class="desc">
+									会员折扣单价(元/月)：
+								</span>
+								<span>{{order_price.dis_val | RMB_symbol}}</span>
+							</div>
+							<div>
+								<span class="desc">
+									购买周期(月):
+								</span>
+								<span>
+									<input type="number"
+									 v-model="orders.period"
+									 min="1"
+									>
+								</span>
+							</div>
 						</div>
 					</div>
 					<!-- <div class="need_state boxs border_btm">
