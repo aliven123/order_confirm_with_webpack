@@ -164,8 +164,9 @@
 								</div>
 								<ul class="bills">
 									<li>
-										<span class="des">商品{{total_obj.volumn}}件，总计</span>
+										<span class="des">商品{{orders.indic_name!==undefined?1:goods.length}}件，总计</span>
 										<span class="val">{{total_obj.price | RMB_symbol}}</span>
+										
 									</li>
 									<li class="tips">
 										<span>使用优惠/金币/费用</span>
@@ -208,12 +209,51 @@
 						<span class="time fl">{{date_now}}</span>
 						<div class="fr boxs">
 							总额<span class="val">{{total_obj.price | RMB_symbol}}</span>
-							共<span class="val">{{total_obj.volumn}}</span>件&nbsp;
+							<!-- 共<span class="val">{{total_obj.volumn}}</span> -->
+							共<span class="val">{{orders.indic_name!==undefined?1:goods.length}}</span>件 &nbsp;
 						</div>
 					</div>
 					<div class="goods boxs">
-						<div class="pic boxs" v-for="(item,index) in goods" :key="index">
+						<!-- <div class="pic boxs" v-for="(item,index) in goods" :key="index">
 							<img :src="item.pic">
+						</div> -->
+						<div class="pic boxs"  v-if="orders.indic_name===undefined">
+							<!-- <img :src="item.pic"> -->
+							<table>
+								<tbody>
+									<tr>
+										<td v-for="(item,name) in good_head"
+										 :key="name"
+										 :class="name"
+										 >
+											<template v-if="name==='price'">
+												{{item.txt}}(¥)
+											</template>
+											<template v-else>
+												<span v-text="item.txt"></span>
+											</template>
+										</td>
+									</tr>
+									<tr v-for="(tr_item,index) in goods" :key="index">
+										<td v-for="(item,name) in good_head"
+										 :key="name"
+										 :class="name"
+										 >
+											<template v-if="name==='pic'">
+												<img :src="tr_item[name]">
+											</template>
+											<template v-else-if="name==='volumn'">
+												<span>
+													{{tr_item[name]+tr_item.unit}}
+												</span>
+											</template>
+											<template v-else>
+												<span v-text="tr_item[name]"></span>
+											</template>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 						<div class="orders_wrapper" v-if="orders.indic_name!==undefined">
 							<div>

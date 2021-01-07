@@ -370,8 +370,28 @@ h3 {
 }
 
 #IsPhone .goods>.pic {
-	width: 20%;
+	border:1px solid #bcbcbd;
+	width: 100%;
 	height: 100%; padding:10px;
+	max-height: 260px;
+	overflow: auto;
+	table{
+		width:500px;
+		border-collapse: collapse;
+		table-layout: fixed;
+		.des{
+			width:200px;
+		}
+		.price{
+			width:60px;
+		}
+		.volumn{
+			width:60px;
+		}
+		.pic{
+			width:200px;
+		}
+	}
 }
 
 #IsPhone .goods>.pic img {

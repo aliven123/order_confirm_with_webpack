@@ -40,6 +40,20 @@ var vm = new Vue({
 			use_switch: false
 		},
 		message: '', //给商家留言
+		good_head:{
+			des:{
+				txt:'品名'
+			},
+			price:{
+				txt:'价格'
+			},
+			volumn:{
+				txt:'周期'
+			},
+			pic:{
+				txt:'收益图'
+			}
+		},
 		goods: [
 			//商品列表
 			/* {
@@ -82,17 +96,17 @@ var vm = new Vue({
 			service_fee: {
 				txt: '手续费',
 				c_mode: '+',
-				val: '-'
+				val: 0
 			},
 			freight_fee: {
 				txt: '运费',
 				c_mode: '+',
-				val: '-'
+				val: 0
 			},
 			tax_fee: {
 				txt: '税金',
 				c_mode: '+',
-				val: '-'
+				val: 0
 			}
 		},
 		payment: {
@@ -129,7 +143,7 @@ var vm = new Vue({
 			return obj;
 		},
 		total_obj() {
-			if(this.indic_name===undefined){
+			if(this.orders.indic_name!==undefined){
 				// 正常下单的商品数量和总计
 				return {
 					price: this.order_price.val*this.orders.period,
@@ -147,7 +161,6 @@ var vm = new Vue({
 					volumn: 0
 				})
 			}
-			
 		},
 		Golddeduct() {
 			//金币抵扣
@@ -188,6 +201,17 @@ var vm = new Vue({
 		}
 	},
 	watch: {
+		invoice:{
+			deep:true,
+			handler(newval){
+				console.log(newval);
+				if(newval.use_switch===true){
+					this.bills.tax_fee.val=this.total_obj.price*newval.rate/100;
+				}else{
+					this.bills.tax_fee.val=0;
+				}
+			}
+		},
 		Golddeduct: {
 			immediate: true,
 			handler(newval) {
@@ -205,17 +229,22 @@ var vm = new Vue({
 	},
 	filters: {
 		RMB_symbol(value) {
-			if (value != undefined && value !== '') {
-				return '¥ ' + value;
-			} else {
+			// console.log(value);
+			const black_arr=[undefined,'-',''];
+			if(black_arr.includes(value)){
 				return value
+			}else{
+				return '¥ ' + Math.round(value*100)/100;
 			}
 		}
 	},
 	methods: {
 		needPayment() {
+			// 实付计算
 			var price = this.total_obj.price;
 			var bills = this.bills;
+			// const {use_switch,rate}=this.invoice;
+			// console.log(rate);
 			for (var key in bills) {
 				if (typeof bills[key].val === 'number') {
 					if (bills[key].c_mode === '-') {
@@ -225,6 +254,9 @@ var vm = new Vue({
 					}
 				}
 			};
+			/* if(use_switch===true){
+				price+=price*rate/100;
+			}; */
 			if (price < 0) {
 				price = 0
 			};
@@ -250,18 +282,18 @@ var vm = new Vue({
 		},
 		mergeOrderData(data){
 			// 普通下单需要数据和接口
-			const {SecurityID,indic_name,indic_type,period}=this.orders;
+			const {SecurityID,indic_name,indic_type,period,p_single_code}=this.orders;
 			
 			//代发的接口
 			let url=this.host + '/order/daifa_pay/';
 			if(indic_name){
 				Object.assign(data,{
-					SecurityID,
+					code:SecurityID,
 					indicname:indic_name,
 					indic_type,
 					buy_time:period,
 					api:0,//下单时api是0
-					// p_single_code:''
+					p_single_code
 				});
 				
 				//正常下单的接口
@@ -294,7 +326,7 @@ var vm = new Vue({
 				orderids = [orderids]
 			};
 			if (location.href.indexOf('127.0.0.1') !== -1) {
-				username = 'nvjan'
+				username = 'lcs11'
 			};
 			const order_info={
 				gold:this.gold,
@@ -314,10 +346,13 @@ var vm = new Vue({
 			if(def==='zfb'){Object.assign(data,{from_url})};
 			ajaxfn(url, 'POST', 'JSON', data, (res) => {
 				console.log(res);
+				let {result,url,code_url,trade_no,mweb_url,reason}=res;
+				trade_no=trade_no===undefined?res.out_trade_no:trade_no;
 				var data = null;
-				if (res.result === 'ok') {
-					if (res.mweb_url||res.url) {
-						location.href = res.mweb_url||res.url;
+				if (result === 'ok') {
+					if (mweb_url||url) {
+						// 支付宝跳转外链
+						location.href = mweb_url||url;
 						return;
 					};
 					if (def === 'wx') {
@@ -325,24 +360,29 @@ var vm = new Vue({
 							hishow: true,
 							data: {
 								pay_by: api,
-								code_url: res.code_url,
+								code_url: code_url,
 								pay_tag: 'agent_delivery',
-								out_trade_no: res.trade_no
+								out_trade_no:trade_no
 							}
 						}
 						this.getQrcode();
-						this.getPaymentResult(api, res.trade_no,from_url);
+						this.getPaymentResult(api,trade_no,from_url);
 					}
 				}else{
-					alert(res.reason)
+					alert(reason)
 				}
 			})
 		},
 		getPaymentResult(pay_by, out_trade_no,from_url) {
+			// 查询微信支付状态的回调函数
 			let data = {
 				out_trade_no
 			};
 			var src = '/order/daifa_callback/' + pay_by + '/';
+			if(this.orders.indic_name){
+				// 普通支付的url
+				src=`/weixin_pay/callback/`
+			};
 			ajaxfn(this.host + src, 'POST', 'json', data, (res) => {
 				if (res.result === 'success' || this.qrcode_ctn.hishow !== true) {
 					this.qrcode_ctn = {
@@ -376,7 +416,8 @@ var vm = new Vue({
 				indic_name,
 				indic_type,
 				indic_price,
-				discount_price
+				discount_price,
+				p_single_code
 			} = queryToObj();
 			if(orderids==='false'){
 				// orderids==='false',说明是普通下单的情况
@@ -385,7 +426,8 @@ var vm = new Vue({
 					indic_name:decodeURI(indic_name),
 					indic_type:decodeURI(indic_type),
 					indic_price,
-					discount_price
+					discount_price,
+					p_single_code
 				})
 			};
 			return {username,orderids}
