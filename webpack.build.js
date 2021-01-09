@@ -1,11 +1,12 @@
 const path=require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin}=require('clean-webpack-plugin');
 const webpack=require('webpack');
-module.exports={
+const configs={
 	mode:'production',
 	devtool:'cheap-module-source-map',
 	entry:{
-		index:'./src/js/index.js'
+		order_confirm:'./src/js/index.js'
 	},
 	output:{
 		filename:'js/[name].js',
@@ -65,14 +66,28 @@ module.exports={
 		}]
 	},
 	plugins: [
-		new HtmlWebpackPlugin({
-			template: './src/index.html',
-			filename: 'index.html',
-			chunks: ['index']
+		new CleanWebpackPlugin({
+			cleanOnceBeforeBuildPatterns:[
+				path.resolve(__dirname,'./dist')
+			]
 		}),
 		new webpack.ProvidePlugin({
 			$:'jquery',
 			Vue:'Vue'
 		})
 	]
+};
+const makeChunks=(configs)=>{
+	let chunks=[];
+	Object.keys(configs.entry).forEach(key=>{
+		chunks.push(key);
+	});
+	configs.plugins.push(new HtmlWebpackPlugin({
+		template: './src/index.html',
+		filename: 'index.html',
+		chunks
+	}));
+	return configs;
 }
+module.exports=makeChunks(configs);
+module.exports=configs;

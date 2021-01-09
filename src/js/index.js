@@ -2,6 +2,7 @@
 import {ajaxfn,queryToObj,IsPC,dataNow} from '../assets/utils.js';
 import '../css/index.less';
 import '../assets/iconfont/iconfont.css';
+
 var vm = new Vue({
 	el: '#main_ctn',
 	data: {
@@ -27,10 +28,11 @@ var vm = new Vue({
 			}
 		},
 		gold: { //金币
-			available: 10000, //可用金币
+			available: 0, //可用金币
 			use_volumn: 0, //使用金币的数量
 			transfer: 100,
-			use_switch: false
+			use_switch: false,
+			total:0
 		},
 		coupon: { //优惠券
 			volumn: 1, //张数
@@ -143,15 +145,17 @@ var vm = new Vue({
 			return obj;
 		},
 		total_obj() {
+			// 商品数量和总价的计算属性,普通下单和一键代发;
+			let obj=null;
 			if(this.orders.indic_name!==undefined){
 				// 正常下单的商品数量和总计
-				return {
+				obj= {
 					price: this.order_price.val*this.orders.period,
 					volumn: this.orders.period
 				}
 			}else{
 				// 代发的商品数量和总计
-				return this.goods.reduce((obj, item) => {
+				obj= this.goods.reduce((obj, item) => {
 					return {
 						price: obj.price + item.price * item.volumn,
 						volumn: obj.volumn + Number.parseInt(item.volumn)
@@ -160,10 +164,12 @@ var vm = new Vue({
 					price: 0,
 					volumn: 0
 				})
-			}
+			};
+			console.log(obj);
+			return obj;
 		},
 		Golddeduct() {
-			//金币抵扣
+			//金币抵扣，在金币模块使用，watch同步更新统计中的bills
 			var gold = this.gold;
 			if (Number.isNaN(Number.parseFloat(gold.use_volumn))) {
 				return 0
@@ -180,7 +186,7 @@ var vm = new Vue({
 			};
 		},
 		coupon_deduct() {
-			//优惠券抵扣
+			//优惠券抵扣,在优惠券模块使用，watch同步更新统计中的bills
 			var coupon = this.coupon;
 			if (Number.isNaN(Number.parseFloat(coupon.use_volumn))) {
 				return 0
@@ -201,6 +207,14 @@ var vm = new Vue({
 		}
 	},
 	watch: {
+		total_obj:{
+			deep:true,
+			handler(newval,oldval){
+				if(oldval){
+					this.countAvailableGold()
+				}
+			}
+		},
 		invoice:{
 			deep:true,
 			handler(newval){
@@ -239,12 +253,31 @@ var vm = new Vue({
 		}
 	},
 	methods: {
+		countAvailableGold(){
+			const available=this.gold.available;
+			const price=this.total_obj.price;
+			const transfer=this.gold.transfer;
+			console.log(available,price);
+			if(available>price/transfer){
+				this.gold.available=Math.ceil(price/transfer);
+			}
+		},
+		countTaxFee(price){
+			// 动态计算税金
+			const {use_switch,rate}=this.invoice;
+			if(use_switch){
+				this.bills.tax_fee.val=price*rate/100;
+			}else{
+				this.bills.tax_fee.val=0;
+			}
+			return this.bills.tax_fee.val
+		},
 		needPayment() {
 			// 实付计算
+			
 			var price = this.total_obj.price;
 			var bills = this.bills;
-			// const {use_switch,rate}=this.invoice;
-			// console.log(rate);
+			const {use_switch,rate}=this.invoice;
 			for (var key in bills) {
 				if (typeof bills[key].val === 'number') {
 					if (bills[key].c_mode === '-') {
@@ -254,6 +287,7 @@ var vm = new Vue({
 					}
 				}
 			};
+			price+=this.countTaxFee(price);
 			/* if(use_switch===true){
 				price+=price*rate/100;
 			}; */
@@ -283,10 +317,7 @@ var vm = new Vue({
 		mergeOrderData(data){
 			// 普通下单需要数据和接口
 			const {SecurityID,indic_name,indic_type,period,p_single_code}=this.orders;
-			
-			//代发的接口
-			let url=this.host + '/order/daifa_pay/';
-			if(indic_name){
+			if(indic_name!==undefined){
 				Object.assign(data,{
 					code:SecurityID,
 					indicname:indic_name,
@@ -295,24 +326,54 @@ var vm = new Vue({
 					api:0,//下单时api是0
 					p_single_code
 				});
-				
-				//正常下单的接口
-				url=`${this.host}/payment/pay/`;
 			};
-			return url;
+		},
+		checkGoldCoupon(){
+			let check_result={
+				status:true,
+				notice:''
+			};
+			const gold=Object.assign(JSON.parse(JSON.stringify(this.gold)),{des:'金币'});
+			const coupon=Object.assign(JSON.parse(JSON.stringify(this.coupon)),{des:'优惠券'});
+			const obj={
+				gold,
+				coupon
+			};
+			console.log(gold,coupon);
+			let available='available';//统一键名
+			for(const [key,item] of Object.entries(obj)){
+				if(item.use_switch===true){
+					available=item.available!=undefined ? 'available':'volumn';
+					console.log(item.use_volumn,item[available]);
+					if(item.use_volumn>item[available]){
+						check_result={
+							status:false,
+							notice:`可使用${item.des}不够，请重试！`
+						};
+						break;
+					}
+				}
+			}
+			return check_result;
 		},
 		handlePayment() {
 			// if(this.needPayment()===0){return};
+			if(this.orders.indic_name===undefined && this.gold.use_switch && this.gold.available>0){
+				alert('一键打发不支持使用金币');
+				return;
+			};
 			if (this.qrcode_ctn.hishow) {
 				this.qrcode_ctn = {
 					hishow: false,
 					data: {}
 				}
 				return;
-			}
+			};
+			const {status,notice}=this.checkGoldCoupon()
+			if(!status){alert(notice);return};
 			var def = this.payment.def;
 			var api = this.payment[def].api;
-			var url;
+			var url=`${this.host}/payment/pay/`;
 			let {orderids,username,from_url} = queryToObj();
 			console.log(from_url);
 			if(from_url && from_url.includes('e_t_r')){
@@ -332,17 +393,17 @@ var vm = new Vue({
 				gold:this.gold,
 				coupon:this.coupon,
 				goods:this.goods,
-				invoice:this.invoice,
-				api:1//代发api是1
+				invoice:this.invoice
 			};
 			var data = {
 				pay_by: api,
 				username: username,
 				orders: JSON.stringify(orderids),
 				order_info:JSON.stringify(order_info),
-				message:this.message
+				message:this.message,
+				api:1//代发api是1
 			};
-			url=this.mergeOrderData(data);
+			this.mergeOrderData(data);
 			if(def==='zfb'){Object.assign(data,{from_url})};
 			ajaxfn(url, 'POST', 'JSON', data, (res) => {
 				console.log(res);
@@ -379,7 +440,7 @@ var vm = new Vue({
 				out_trade_no
 			};
 			var src = '/order/daifa_callback/' + pay_by + '/';
-			if(this.orders.indic_name){
+			if(this.orders.indic_name!==undefined){
 				// 普通支付的url
 				src=`/weixin_pay/callback/`
 			};
@@ -450,7 +511,7 @@ var vm = new Vue({
 
 					goods.forEach((item) => {
 						good_arr.push({
-							pic: 'https://362965b2f6.picp.vip' + item.img,
+							pic: 'https://data.nujin.com' + item.img,
 							des: item.title,
 							price: item.price,
 							volumn: item.num,
@@ -468,12 +529,14 @@ var vm = new Vue({
 					this.coupon.limit = 1000; */
 					this.gold.available=gold.available;
 					this.gold.transfer=gold.transfer;
+					this.gold.total=gold.available;
 					
 					this.coupon.volumn = coupon.volumn;
 					this.coupon.price = coupon.price;
 					this.coupon.limit = coupon.limit;
 					
-					this.invoice.rate=tax_rate*100;
+					// 发票的税率，1%中的1;
+					this.invoice.rate=tax_rate;
 					if (goods.length === 0&&orderids!=='false') {
 						alert('没有需要支付的订单！')
 					}
@@ -485,11 +548,8 @@ var vm = new Vue({
 		if (location.href.includes('localhost') || location.href.includes('127.0.0.1')) {
 			this.host = 'http://10.88.71.83:8008'
 		} else {
-			this.host = 'https://data.aupool.cn'
+			this.host = 'https://data.nujin.com'
 		};
 		this.initDatas();
-	},
-	mounted() {
-		// console.log('测试更新')
 	}
 })

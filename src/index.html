@@ -24,25 +24,12 @@
 			</div>
 			<template v-if="IsPC===true">
 				<!-- pc端 -->
-				<!-- <div class="need_state boxs border_btm">
-					<ul class="boxs clearfix">
-						<li v-for="(item,name) in need_state.menus" class="fl boxs" :class="{active:name===need_state.def}" @click="handleNeedstate(name)">
-							<h4 v-text="item.txt"></h4>
-							<template v-if="name==='not_delivery'">
-								<p v-text="item.val"></p>
-							</template>
-							<template v-else>
-								<textarea :style="{'width':IsPC?'402px':'220px'}" cols="3" placeholder="在这里输入收货地址 " v-model.trim="item.val">
-								</textarea>
-							</template>
-						</li>
-					</ul>
-				</div> -->
 				<div id="IsPC">
 					<div class="center_ctn boxs">
 						<!--金币和优惠券模块 -->
 						<div class="g_c_ctn border_btm clearfix">
 							<div class="gold boxs fl">
+								<p>总金币 <span>{{gold.total}}</span></p>
 								<p>可用金币<span>{{gold.available}}</span>（{{gold.transfer}}金币=¥1）</p>
 								<div>
 									<label>
@@ -71,7 +58,6 @@
 									张，可抵扣{{coupon_deduct | RMB_symbol}}
 								</p>
 								<p>满{{coupon.limit | RMB_symbol}}可用</p>
-
 							</div>
 							<div class="message boxs fl">
 								<p>给商家留言</p>
@@ -138,6 +124,8 @@
 								</li>
 							</ul>
 							<div class="orders_details boxs">
+								
+								<!-- 需要计算计算发票，打开注释即可 -->
 								<div class="invoice boxs">
 									<div class="clearfix">
 										<span class="fl">发票（税率{{invoice.rate}}%）</span>
@@ -146,7 +134,7 @@
 											<input type="checkbox" v-model="invoice.use_switch">
 										</label>
 									</div>
-									<template v-if="invoice.use_switch===true">
+									 <template v-if="invoice.use_switch===true">
 										<div class="ipt_ctn boxs">
 											<span class="des">抬头：</span>
 											<input type="text" placeholder="请输入发票抬头" v-model.trim="invoice.head">
@@ -317,26 +305,28 @@
 					</div>
 					<div class="gold boxs">
 						<p class="clearfix">
-							<span class="fl">金币：<span class="val">{{gold.available}}个</span></span>
+							<span class="fl">总金币：<span class="val">{{gold.total}}个</span></span>
 							<span class="fr">（{{gold.transfer}}金币=¥1）</span>
 						</p>
-						<p class="use_gold clearfix">
+						
+						<p class="checkbox_ctn clearfix">
+							<span class="fl">可用金币：<span class="val">{{gold.available}}个</span></span>
+							<label class="fr">
+								使用金币
+								<input type="checkbox" v-model="gold.use_switch" />
+							</label>
+						</p>
+						<div class="use_gold clearfix">
 							<div class="fl">
 								<label>
 									使用金币
 								</label>
 								<input type="number" min="0" max="100000000" placeholder="输金币数量" v-model.trim="gold.use_volumn">个，
 							</div>
-							<div>
+							<div class="fl">
 								可抵扣<span>{{Golddeduct | RMB_symbol}}</span>
 							</div>
-						</p>
-						<p class="checkbox_ctn">
-							<label>
-								使用金币
-								<input type="checkbox" v-model="gold.use_switch" />
-							</label>
-						</p>
+						</div>
 					</div>
 					<div class="coupon boxs">
 						<div class="clearfix">
@@ -358,6 +348,8 @@
 						</div>
 						<i>注：满{{coupon.limit | RMB_symbol}}可用</i>
 					</div>
+					
+					<!-- 需要计算计算发票，打开注释即可 -->
 					<div class="invoice boxs">
 						<div class="clearfix">
 							发票税率：<span class="val">{{invoice.rate}}%</span>
@@ -366,7 +358,6 @@
 								<input type="checkbox" v-model="invoice.use_switch">
 							</label>
 						</div>
-						<!-- <template v-if="invoice.use_switch===true"> -->
 						<template>
 							<div class="ipt_ctn boxs">
 								<span class="des">抬头：</span>
