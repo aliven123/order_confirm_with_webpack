@@ -13,6 +13,10 @@ var vm = new Vue({
 			hishow: false,
 			data: {}
 		},
+		payment_wrapper:{
+			hishow:false,
+			msg:'恭喜您，订单支付成功！'
+		},
 		date_now: dataNow,
 		need_state: {
 			def: 'not_delivery',
@@ -265,6 +269,8 @@ var vm = new Vue({
 		countTaxFee(price){
 			// 动态计算税金
 			const {use_switch,rate}=this.invoice;
+			console.log(price);
+			price=price<0?0:price;
 			if(use_switch){
 				this.bills.tax_fee.val=price*rate/100;
 			}else{
@@ -411,6 +417,7 @@ var vm = new Vue({
 				trade_no=trade_no===undefined?res.out_trade_no:trade_no;
 				var data = null;
 				if (result === 'ok') {
+					
 					if (mweb_url||url) {
 						// 支付宝跳转外链
 						location.href = mweb_url||url;
@@ -429,10 +436,18 @@ var vm = new Vue({
 						this.getQrcode();
 						this.getPaymentResult(api,trade_no,from_url);
 					}
+				}else if(result === 'jinbiok'){
+					this.callBackUrl(from_url)
 				}else{
 					alert(reason)
 				}
 			})
+		},
+		callBackUrl(from_url){
+			Object.assign(this.payment_wrapper,{hishow:true});
+			setTimeout(()=>{
+				window.open(from_url,'_self');
+			},1500);
 		},
 		getPaymentResult(pay_by, out_trade_no,from_url) {
 			// 查询微信支付状态的回调函数
@@ -451,7 +466,7 @@ var vm = new Vue({
 						hishow: false
 					};
 					if(res.result === 'success' && from_url){
-						window.open(from_url,'_self');
+						this.callBackUrl(from_url);
 					}
 					return
 				};
@@ -504,8 +519,8 @@ var vm = new Vue({
 			ajaxfn(url, 'POST', 'JSON', data, (res) => {
 				console.log(res);
 				if (res.result === 'success') {
-					let {goods,gold,coupon,tax_rate} = res.data;
-					console.log(this.gold);
+					let {goods,gold,coupon,default_nashui_info:invoice} = res.data;
+					console.log(invoice);
 					// this.gold.available=data.goldcoin;
 					var good_arr = [];
 
@@ -536,7 +551,12 @@ var vm = new Vue({
 					this.coupon.limit = coupon.limit;
 					
 					// 发票的税率，1%中的1;
-					this.invoice.rate=tax_rate;
+					// this.invoice.rate=default_nashui_info.rate;
+					Object.assign(this.invoice,{
+						rate:invoice.rate,
+						head:invoice.taitou,
+						tax_id:invoice.shuihao
+					})
 					if (goods.length === 0&&orderids!=='false') {
 						alert('没有需要支付的订单！')
 					}

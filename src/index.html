@@ -22,6 +22,14 @@
 				<div id="qrcode"></div>
 				<p></p>
 			</div>
+			<div id="payment_wrapper" 
+				v-if="payment_wrapper.hishow"
+				 class="boxs"
+				
+			>
+				<span class="iconfont iconzhifuchenggong"></span>
+				<span v-html="payment_wrapper.msg"></span>
+			</div>
 			<template v-if="IsPC===true">
 				<!-- pc端 -->
 				<div id="IsPC">
@@ -399,12 +407,12 @@
 							<div class="fr action">
 								<span>
 									<label>
-										微信
 										<input type="radio" value="wx" v-model="payment.def">
+										微信
 									</label>
 									<label>
-										支付宝
 										<input type="radio" value="zfb" v-model="payment.def">
+										支付宝
 									</label>
 								</span>
 								<span class="payment_order" @click="handlePayment">
