@@ -123,6 +123,7 @@ h3 {
 	background:white;
 	color:@hvsubmenublue;
 	width:260px;
+	min-height:100px;
 	position: fixed;
 	border-radius: 5px;
 	left:50%;
@@ -130,6 +131,14 @@ h3 {
 	padding:10px;
 	transform:translate(-50%,-50%);
 	box-shadow: 0 0 5px black;
+	
+		display: flex;
+		display: -webkit-flex;
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: center;
+		align-items: center;
+	
 }
 /* pc端样式 */
 #IsPC input[type=button] {
