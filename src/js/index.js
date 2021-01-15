@@ -603,5 +603,6 @@ var vm = new Vue({
 			this.host = 'https://data.nujin.com'
 		};
 		this.initDatas();
+		console.log('test fetch')
 	}
 })
