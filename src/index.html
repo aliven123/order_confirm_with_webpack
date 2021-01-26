@@ -331,7 +331,10 @@
 								<label>
 									使用金币
 								</label>
-								<input type="number" min="0" max="100000000" placeholder="输金币数量" v-model.trim="gold.use_volumn">个，
+								<input type="number" min="0"
+								 max="100000000"
+								  placeholder="输金币数量"
+								   v-model.trim="gold.use_volumn">个，
 							</div>
 							<div class="fl">
 								可抵扣<span>{{Golddeduct | RMB_symbol}}</span>

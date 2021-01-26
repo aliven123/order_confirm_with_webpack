@@ -13,6 +13,7 @@ var vm = new Vue({
 			hishow: false,
 			data: {}
 		},
+		rq_switch:true,//避免重复请求的开关
 		payment_wrapper:{
 			hishow:false,
 			msg:'恭喜您，订单支付成功！'
@@ -275,18 +276,6 @@ var vm = new Vue({
 		},
 		countTaxFee(price){
 			// 动态计算税金
-			const {use_switch,rate}=this.invoice;
-			console.log(price);
-			price=price<0?0:price;
-			if(use_switch){
-				this.bills.tax_fee.val=price*rate/100;
-			}else{
-				this.bills.tax_fee.val=0;
-			}
-			return this.bills.tax_fee.val
-		},
-		countTaxFee(price){
-			// 动态计算税金
 			const {use_switch:i_switch,rate}=this.invoice;
 			const {use_volumn,transfer}=this.gold;
 			// console.log(price);
@@ -387,16 +376,13 @@ var vm = new Vue({
 			// if(this.needPayment()===0){return};
 			if(this.orders.indic_name===undefined && this.gold.use_switch && this.gold.available>0){
 				// alert('一键打发不支持使用金币');
-				this.callBackUrl(false,'一键打发不支持使用金币')
+				this.callBackUrl(false,'一键代发不支持使用金币')
 				return;
 			};
-			if (this.qrcode_ctn.hishow) {
-				this.qrcode_ctn = {
-					hishow: false,
-					data: {}
-				}
+			if (this.qrcode_ctn.hishow||this.rq_switch===false) {
 				return;
 			};
+			this.rq_switch=false;
 			const {status,notice}=this.checkGoldCoupon()
 			if(!status){
 				this.callBackUrl(false,notice);return
@@ -437,17 +423,20 @@ var vm = new Vue({
 			if(def==='zfb'){Object.assign(data,{from_url})};
 			ajaxfn(url, 'POST', 'JSON', data, (res) => {
 				console.log(res);
-				let {result,url,code_url,trade_no,mweb_url,reason}=res;
+				let {result,url,code_url,trade_no,mweb_url,reason,'data':wx_data}=res;
 				trade_no=trade_no===undefined?res.out_trade_no:trade_no;
 				var data = null;
 				if (result === 'ok') {
-					
 					if (mweb_url||url) {
 						// 支付宝跳转外链
 						location.href = mweb_url||url;
 						return;
 					};
 					if (def === 'wx') {
+						if(navigator.userAgent.includes('MicroMessenger') && wx_data){
+							this.onBridgeReady(wx_data);
+							return;
+						};
 						this.qrcode_ctn = {
 							hishow: true,
 							data: {
@@ -456,17 +445,26 @@ var vm = new Vue({
 								pay_tag: 'agent_delivery',
 								out_trade_no:trade_no
 							}
-						}
+						};
 						this.getQrcode();
 						this.getPaymentResult(api,trade_no,from_url);
 					}
 				}else if(result === 'jinbiok'){
 					this.callBackUrl(from_url)
 				}else{
-					// alert(reason)
 					this.callBackUrl(false,reason)
 				}
+				this.rq_switch=true;
 			})
+		},
+		onBridgeReady(data) {
+			// 移动端调唤起微信支付；
+		   WeixinJSBridge.invoke(
+			  'getBrandWCPayRequest', data,
+			  function(res){
+			  if(res.err_msg == "get_brand_wcpay_request:ok" ){
+			  }
+		   });
 		},
 		callBackUrl(from_url,msg='恭喜您，订单支付成功！'){
 			// 全局消息提示框
