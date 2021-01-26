@@ -1,5 +1,10 @@
 // import QRCode from '../assets/qrcode.js';
-import {ajaxfn,queryToObj,IsPC,dataNow} from '../assets/utils.js';
+import {
+	ajaxfn,
+	queryToObj,
+	IsPC,
+	dataNow
+} from '../assets/utils.js';
 import '../css/index.less';
 import '../assets/iconfont/iconfont.css';
 
@@ -8,15 +13,17 @@ var vm = new Vue({
 	data: {
 		host: '',
 		IsPC,
-		orders:{period:12},//{非空对象},说明是正常下单状态；否则,是一键代发状态
+		orders: {
+			period: 12
+		}, //{非空对象},说明是正常下单状态；否则,是一键代发状态
 		qrcode_ctn: {
 			hishow: false,
 			data: {}
 		},
-		rq_switch:true,//避免重复请求的开关
-		payment_wrapper:{
-			hishow:false,
-			msg:'恭喜您，订单支付成功！'
+		rq_switch: true, //避免重复请求的开关
+		payment_wrapper: {
+			hishow: false,
+			msg: '恭喜您，订单支付成功！'
 		},
 		date_now: dataNow,
 		need_state: {
@@ -37,7 +44,7 @@ var vm = new Vue({
 			use_volumn: 0, //使用金币的数量
 			transfer: 100,
 			use_switch: true,
-			total:0
+			total: 0
 		},
 		coupon: { //优惠券
 			volumn: 1, //张数
@@ -47,18 +54,18 @@ var vm = new Vue({
 			use_switch: false
 		},
 		message: '', //给商家留言
-		good_head:{
-			des:{
-				txt:'品名'
+		good_head: {
+			des: {
+				txt: '品名'
 			},
-			price:{
-				txt:'价格'
+			price: {
+				txt: '价格'
 			},
-			volumn:{
-				txt:'周期'
+			volumn: {
+				txt: '周期'
 			},
-			pic:{
-				txt:'收益图'
+			pic: {
+				txt: '收益图'
 			}
 		},
 		goods: [
@@ -127,22 +134,29 @@ var vm = new Vue({
 		}
 	},
 	computed: {
-		order_price(){
+		order_price() {
 			this.initOrders();
-			const {discount_price,indic_price}=this.orders;
-			const obj={des:'',val:'',dis_val:'false'};
+			const {
+				discount_price,
+				indic_price
+			} = this.orders;
+			const obj = {
+				des: '',
+				val: '',
+				dis_val: 'false'
+			};
 			// dis_val不为'false'时显示，引导用户
 			console.log(indic_price);
-			if(indic_price!==undefined){
+			if (indic_price !== undefined) {
 				console.log(indic_price);
-				obj.val=indic_price;
-				if(discount_price==='false'){
+				obj.val = indic_price;
+				if (discount_price === 'false') {
 					// 没有折扣
-					obj.des='单价（元/月）:';
-					obj.dis_val=indic_price*0.9.toFixed(2);
-				}else{
-					obj.des='会员折扣单价（元/月）：';
-					obj.val=discount_price;
+					obj.des = '单价（元/月）:';
+					obj.dis_val = indic_price * 0.9.toFixed(2);
+				} else {
+					obj.des = '会员折扣单价（元/月）：';
+					obj.val = discount_price;
 				}
 			};
 			console.log(this.orders);
@@ -151,16 +165,16 @@ var vm = new Vue({
 		},
 		total_obj() {
 			// 商品数量和总价的计算属性,普通下单和一键代发;
-			let obj=null;
-			if(this.orders.indic_name!==undefined){
+			let obj = null;
+			if (this.orders.indic_name !== undefined) {
 				// 正常下单的商品数量和总计
-				obj= {
-					price: this.order_price.val*this.orders.period,
+				obj = {
+					price: this.order_price.val * this.orders.period,
 					volumn: this.orders.period
 				}
-			}else{
+			} else {
 				// 代发的商品数量和总计
-				obj= this.goods.reduce((obj, item) => {
+				obj = this.goods.reduce((obj, item) => {
 					return {
 						price: obj.price + item.price * item.volumn,
 						volumn: obj.volumn + Number.parseInt(item.volumn)
@@ -212,22 +226,22 @@ var vm = new Vue({
 		}
 	},
 	watch: {
-		total_obj:{
-			deep:true,
-			handler(newval,oldval){
-				if(oldval){
+		total_obj: {
+			deep: true,
+			handler(newval, oldval) {
+				if (oldval) {
 					this.countAvailableGold()
 				}
 			}
 		},
-		invoice:{
-			deep:true,
-			handler(newval){
+		invoice: {
+			deep: true,
+			handler(newval) {
 				console.log(newval);
-				if(newval.use_switch===true){
-					this.bills.tax_fee.val=this.total_obj.price*newval.rate/100;
-				}else{
-					this.bills.tax_fee.val=0;
+				if (newval.use_switch === true) {
+					this.bills.tax_fee.val = this.total_obj.price * newval.rate / 100;
+				} else {
+					this.bills.tax_fee.val = 0;
 				}
 			}
 		},
@@ -249,54 +263,62 @@ var vm = new Vue({
 	filters: {
 		RMB_symbol(value) {
 			// console.log(value);
-			const black_arr=[undefined,'-',''];
-			if(black_arr.includes(value)){
+			const black_arr = [undefined, '-', ''];
+			if (black_arr.includes(value)) {
 				return value
-			}else{
-				return '¥ ' + Math.round(value*100)/100;
+			} else {
+				return '¥ ' + Math.round(value * 100) / 100;
 			}
 		}
 	},
 	methods: {
-		countAvailableGold(){
+		countAvailableGold() {
 			// 计算可用金币
 			//总金币大于总计，则可用金币上限是总计/金币面值
 			//如果总金币小于总计，则可用金币上限是总金币
-			const total=this.gold.total;
-			const price=this.total_obj.price;
-			const transfer=this.gold.transfer;
-			console.log(total,price);
-			
-			if(total>price/transfer){
-				this.gold.available=Math.ceil(price/transfer);
-			}else{
-				this.gold.available=total;
+			const total = this.gold.total;
+			const price = this.total_obj.price;
+			const transfer = this.gold.transfer;
+			console.log(total, price);
+
+			if (total > price / transfer) {
+				this.gold.available = Math.ceil(price / transfer);
+			} else {
+				this.gold.available = total;
 			}
-			this.gold.use_volumn=this.gold.available;
+			this.gold.use_volumn = this.gold.available;
 		},
-		countTaxFee(price){
+		countTaxFee(price) {
 			// 动态计算税金
-			const {use_switch:i_switch,rate}=this.invoice;
-			const {use_volumn,transfer}=this.gold;
+			const {
+				use_switch: i_switch,
+				rate
+			} = this.invoice;
+			const {
+				use_volumn,
+				transfer
+			} = this.gold;
 			// console.log(price);
 			// console.log(i_switch,rate);
 			// console.log(use_volumn,transfer);
-			price=price<0?0:price;
-			if(i_switch){//发票开关
-				this.bills.tax_fee.val=price*rate/100;
-			}else{
-				this.bills.tax_fee.val=0;
+			price = price < 0 ? 0 : price;
+			if (i_switch) { //发票开关
+				this.bills.tax_fee.val = price * rate / 100;
+			} else {
+				this.bills.tax_fee.val = 0;
 			}
 			// console.log(this.bills.tax_fee.val);	
 			return this.bills.tax_fee.val;
 		},
 		needPayment() {
 			// 实付计算
-			
+
 			var price = this.total_obj.price;
 			var bills = this.bills;
 			for (var key in bills) {
-				if(key==='tax_fee'){continue};
+				if (key === 'tax_fee') {
+					continue
+				};
 				if (typeof bills[key].val === 'number') {
 					if (bills[key].c_mode === '-') {
 						price -= bills[key].val;
@@ -306,7 +328,7 @@ var vm = new Vue({
 				}
 			};
 			console.log()
-			price+=this.countTaxFee(price);
+			price += this.countTaxFee(price);
 			if (price < 0) {
 				price = 0
 			};
@@ -319,52 +341,62 @@ var vm = new Vue({
 			setTimeout(() => {
 				const qrcode = document.querySelector('#qrcode_ctn #qrcode');
 				var code_url = this.qrcode_ctn.data.code_url;
-				const QRCode= require('../assets/qrcode.js');
+				const QRCode = require('../assets/qrcode.js');
 				new QRCode(qrcode, {
-				  text: code_url,
-				  width: 168, //图像宽度
-				  height: 168, //图像高度
+					text: code_url,
+					width: 168, //图像宽度
+					height: 168, //图像高度
 				});
 			}, 0)
 		},
 		closeQrcode() {
 			this.qrcode_ctn.hishow = false;
 		},
-		mergeOrderData(data){
+		mergeOrderData(data) {
 			// 普通下单需要数据和接口
-			const {SecurityID,indic_name,indic_type,period,p_single_code}=this.orders;
-			if(indic_name!==undefined){
-				Object.assign(data,{
-					code:SecurityID,
-					indicname:indic_name,
+			const {
+				SecurityID,
+				indic_name,
+				indic_type,
+				period,
+				p_single_code
+			} = this.orders;
+			if (indic_name !== undefined) {
+				Object.assign(data, {
+					code: SecurityID,
+					indicname: indic_name,
 					indic_type,
-					buy_time:period,
-					api:0,//下单时api是0
+					buy_time: period,
+					api: 0, //下单时api是0
 					p_single_code
 				});
 			};
 		},
-		checkGoldCoupon(){
-			let check_result={
-				status:true,
-				notice:''
+		checkGoldCoupon() {
+			let check_result = {
+				status: true,
+				notice: ''
 			};
-			const gold=Object.assign(JSON.parse(JSON.stringify(this.gold)),{des:'金币'});
-			const coupon=Object.assign(JSON.parse(JSON.stringify(this.coupon)),{des:'优惠券'});
-			const obj={
+			const gold = Object.assign(JSON.parse(JSON.stringify(this.gold)), {
+				des: '金币'
+			});
+			const coupon = Object.assign(JSON.parse(JSON.stringify(this.coupon)), {
+				des: '优惠券'
+			});
+			const obj = {
 				gold,
 				coupon
 			};
-			console.log(gold,coupon);
-			let available='available';//统一键名
-			for(const [key,item] of Object.entries(obj)){
-				if(item.use_switch===true){
-					available=item.available!=undefined ? 'available':'volumn';
-					console.log(item.use_volumn,item[available]);
-					if(item.use_volumn>item[available]){
-						check_result={
-							status:false,
-							notice:`可使用${item.des}不够，请重试！`
+			console.log(gold, coupon);
+			let available = 'available'; //统一键名
+			for (const [key, item] of Object.entries(obj)) {
+				if (item.use_switch === true) {
+					available = item.available != undefined ? 'available' : 'volumn';
+					console.log(item.use_volumn, item[available]);
+					if (item.use_volumn > item[available]) {
+						check_result = {
+							status: false,
+							notice: `可使用${item.des}不够，请重试！`
 						};
 						break;
 					}
@@ -374,27 +406,35 @@ var vm = new Vue({
 		},
 		handlePayment() {
 			// if(this.needPayment()===0){return};
-			if(this.orders.indic_name===undefined && this.gold.use_switch && this.gold.available>0){
+			if (this.orders.indic_name === undefined && this.gold.use_switch && this.gold.available > 0) {
 				// alert('一键打发不支持使用金币');
-				this.callBackUrl(false,'一键代发不支持使用金币')
+				this.callBackUrl(false, '一键代发不支持使用金币')
 				return;
 			};
-			if (this.qrcode_ctn.hishow||this.rq_switch===false) {
+			if (this.qrcode_ctn.hishow || this.rq_switch === false) {
 				return;
 			};
-			this.rq_switch=false;
-			const {status,notice}=this.checkGoldCoupon()
-			if(!status){
-				this.callBackUrl(false,notice);return
+			this.rq_switch = false;
+			const {
+				status,
+				notice
+			} = this.checkGoldCoupon()
+			if (!status) {
+				this.callBackUrl(false, notice);
+				return
 			};
 			var def = this.payment.def;
 			var api = this.payment[def].api;
-			var url=`${this.host}/payment/pay/`;
-			let {orderids,username,from_url} = queryToObj();
+			var url = `${this.host}/payment/pay/`;
+			let {
+				orderids,
+				username,
+				from_url
+			} = queryToObj();
 			console.log(from_url);
-			if(from_url && from_url.includes('e_t_r')){
-				from_url=from_url.replace(/\[a_t_r\]/g,'&');
-				from_url=from_url.replace(/\[e_t_r\]/g,'=');
+			if (from_url && from_url.includes('e_t_r')) {
+				from_url = from_url.replace(/\[a_t_r\]/g, '&');
+				from_url = from_url.replace(/\[e_t_r\]/g, '=');
 			};
 			console.log(from_url);
 			if (orderids.indexOf('_') !== -1) {
@@ -405,35 +445,52 @@ var vm = new Vue({
 			if (location.href.indexOf('127.0.0.1') !== -1) {
 				username = 'lcs11'
 			};
-			const order_info={
-				gold:this.gold,
-				coupon:this.coupon,
-				goods:this.goods,
-				invoice:this.invoice
+			const order_info = {
+				gold: this.gold,
+				coupon: this.coupon,
+				goods: this.goods,
+				invoice: this.invoice
 			};
 			var data = {
 				pay_by: api,
 				username: username,
 				orders: JSON.stringify(orderids),
-				order_info:JSON.stringify(order_info),
-				message:this.message,
-				api:1//代发api是1
+				order_info: JSON.stringify(order_info),
+				message: this.message,
+				api: 1 //代发api是1
 			};
 			this.mergeOrderData(data);
-			if(def==='zfb'){Object.assign(data,{from_url})};
+			if (def === 'zfb') {
+				Object.assign(data, {
+					from_url
+				})
+			};
 			ajaxfn(url, 'POST', 'JSON', data, (res) => {
 				console.log(res);
-				let {result,url,code_url,trade_no,mweb_url,reason,'data':wx_data}=res;
-				trade_no=trade_no===undefined?res.out_trade_no:trade_no;
+				let {
+					result,
+					url,
+					code_url,
+					trade_no,
+					mweb_url,
+					reason,
+					'data': wx_data
+				} = res;
+				trade_no = trade_no === undefined ? res.out_trade_no : trade_no;
 				var data = null;
 				if (result === 'ok') {
-					if (mweb_url||url) {
+					if (mweb_url || url) {
 						// 支付宝跳转外链
-						location.href = mweb_url||url;
+						location.href = mweb_url || url;
 						return;
 					};
 					if (def === 'wx') {
-						if(navigator.userAgent.includes('MicroMessenger') && wx_data){
+						alert('MicroMessenger');
+						alert(wx_data);
+						alert(navigator.userAgent.includes('MicroMessenger'));
+						
+						if (navigator.userAgent.includes('MicroMessenger') && wx_data) {
+							alert('wx_data');
 							this.onBridgeReady(wx_data);
 							return;
 						};
@@ -443,50 +500,67 @@ var vm = new Vue({
 								pay_by: api,
 								code_url: code_url,
 								pay_tag: 'agent_delivery',
-								out_trade_no:trade_no
+								out_trade_no: trade_no
 							}
 						};
 						this.getQrcode();
-						this.getPaymentResult(api,trade_no,from_url);
+						this.getPaymentResult(api, trade_no, from_url);
 					}
-				}else if(result === 'jinbiok'){
+				} else if (result === 'jinbiok') {
 					this.callBackUrl(from_url)
-				}else{
-					this.callBackUrl(false,reason)
+				} else {
+					this.callBackUrl(false, reason)
 				}
-				this.rq_switch=true;
+				this.rq_switch = true;
 			})
 		},
 		onBridgeReady(data) {
 			// 移动端调唤起微信支付；
-		   WeixinJSBridge.invoke(
-			  'getBrandWCPayRequest', data,
-			  function(res){
-			  if(res.err_msg == "get_brand_wcpay_request:ok" ){
-			  }
-		   });
-		},
-		callBackUrl(from_url,msg='恭喜您，订单支付成功！'){
-			// 全局消息提示框
-			Object.assign(this.payment_wrapper,{hishow:true,msg});
-			let time=from_url?2000:2500;
-			setTimeout(()=>{
-				if(from_url){
-					window.open(from_url,'_self');
-				}else{
-					Object.assign(this.payment_wrapper,{hishow:false});
+			const callback=function(){
+				WeixinJSBridge.invoke(
+				'getBrandWCPayRequest', data,
+				function(res) {
+					if (res.err_msg == "get_brand_wcpay_request:ok") {}
+				})
+			};
+			if (typeof WeixinJSBridge == "undefined") {
+				alert('invoke');
+				if (document.addEventListener) {
+					document.addEventListener('WeixinJSBridgeReady', callback, false);
+				} else if (document.attachEvent) {
+					document.attachEvent('WeixinJSBridgeReady', callback);
+					document.attachEvent('onWeixinJSBridgeReady', callback);
 				}
-			},time);
+			} else {
+				callback();
+			};
 		},
-		getPaymentResult(pay_by, out_trade_no,from_url) {
+		callBackUrl(from_url, msg = '恭喜您，订单支付成功！') {
+			// 全局消息提示框
+			Object.assign(this.payment_wrapper, {
+				hishow: true,
+				msg
+			});
+			let time = from_url ? 2000 : 2500;
+			setTimeout(() => {
+				if (from_url) {
+					window.open(from_url, '_self');
+				} else {
+					Object.assign(this.payment_wrapper, {
+						hishow: false
+					});
+				}
+			}, time);
+		},
+		getPaymentResult(pay_by, out_trade_no, from_url) {
 			// 查询微信支付状态的回调函数
 			let data = {
 				out_trade_no
 			};
 			var src = '/order/daifa_callback/' + pay_by + '/';
-			if(this.orders.indic_name!==undefined){
+			if (this.orders.indic_name !== undefined) {
 				// 普通支付的url
-				src=`/weixin_pay/callback/`
+				src = `/weixin_pay/callback/`
 			};
 			ajaxfn(this.host + src, 'POST', 'json', data, (res) => {
 				if (res.result === 'success' || this.qrcode_ctn.hishow !== true) {
@@ -494,26 +568,28 @@ var vm = new Vue({
 						data: {},
 						hishow: false
 					};
-					if(res.result === 'success' && from_url){
+					if (res.result === 'success' && from_url) {
 						this.callBackUrl(from_url);
 					}
 					return
 				};
 				setTimeout(() => {
-					this.getPaymentResult(pay_by, out_trade_no,from_url);
+					this.getPaymentResult(pay_by, out_trade_no, from_url);
 				}, 2000);
 			})
 		},
-		handleGoBack(){
-			let {from_url} = queryToObj();
+		handleGoBack() {
+			let {
+				from_url
+			} = queryToObj();
 			console.log(from_url);
-			if(from_url && from_url.includes('e_t_r')){
-				from_url=from_url.replace(/\[a_t_r\]/g,'&');
-				from_url=from_url.replace(/\[e_t_r\]/g,'=');
+			if (from_url && from_url.includes('e_t_r')) {
+				from_url = from_url.replace(/\[a_t_r\]/g, '&');
+				from_url = from_url.replace(/\[e_t_r\]/g, '=');
 			};
-			window.open(from_url,'_self');
+			window.open(from_url, '_self');
 		},
-		initOrders(){
+		initOrders() {
 			var {
 				orderids,
 				username,
@@ -524,21 +600,27 @@ var vm = new Vue({
 				discount_price,
 				p_single_code
 			} = queryToObj();
-			if(orderids==='false'){
+			if (orderids === 'false') {
 				// orderids==='false',说明是普通下单的情况
-				Object.assign(this.orders,{
-					SecurityID:decodeURI(SecurityID),
-					indic_name:decodeURI(indic_name),
-					indic_type:decodeURI(indic_type),
+				Object.assign(this.orders, {
+					SecurityID: decodeURI(SecurityID),
+					indic_name: decodeURI(indic_name),
+					indic_type: decodeURI(indic_type),
 					indic_price,
 					discount_price,
 					p_single_code
 				})
 			};
-			return {username,orderids}
+			return {
+				username,
+				orderids
+			}
 		},
 		initDatas() {
-			const {orderids,username}=this.initOrders();
+			const {
+				orderids,
+				username
+			} = this.initOrders();
 			var url = this.host + '/payment/get_order_infos/';
 			var data = {
 				orders: orderids,
@@ -548,7 +630,12 @@ var vm = new Vue({
 			ajaxfn(url, 'POST', 'JSON', data, (res) => {
 				console.log(res);
 				if (res.result === 'success') {
-					let {goods,gold,coupon,default_nashui_info:invoice} = res.data;
+					let {
+						goods,
+						gold,
+						coupon,
+						default_nashui_info: invoice
+					} = res.data;
 					console.log(invoice);
 					// this.gold.available=data.goldcoin;
 					var good_arr = [];
@@ -564,31 +651,31 @@ var vm = new Vue({
 					})
 					// 生产环境,goods注释行打开
 					this.goods = good_arr;
-					
+
 					/* this.gold.available = 1000;
 					this.gold.transfer = 1;
 
 					this.coupon.volumn = 5;
 					this.coupon.price = 10;
 					this.coupon.limit = 1000; */
-					this.gold.available=gold.available;
-					this.gold.transfer=gold.transfer;
-					this.gold.total=gold.available;
-					
+					this.gold.available = gold.available;
+					this.gold.transfer = gold.transfer;
+					this.gold.total = gold.available;
+
 					this.coupon.volumn = coupon.volumn;
 					this.coupon.price = coupon.price;
 					this.coupon.limit = coupon.limit;
-					
+
 					// 发票的税率，1%中的1;
 					// this.invoice.rate=default_nashui_info.rate;
-					Object.assign(this.invoice,{
-						rate:invoice.rate,
-						head:invoice.taitou,
-						tax_id:invoice.shuihao
+					Object.assign(this.invoice, {
+						rate: invoice.rate,
+						head: invoice.taitou,
+						tax_id: invoice.shuihao
 					})
-					if (goods.length === 0&&orderids!=='false') {
+					if (goods.length === 0 && orderids !== 'false') {
 						// alert('没有需要支付的订单！')
-						this.callBackUrl(false,'没有需要支付的订单！')
+						this.callBackUrl(false, '没有需要支付的订单！')
 					}
 				}
 			});
