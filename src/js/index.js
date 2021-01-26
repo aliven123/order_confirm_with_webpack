@@ -485,12 +485,7 @@ var vm = new Vue({
 						return;
 					};
 					if (def === 'wx') {
-						alert('MicroMessenger');
-						alert(wx_data);
-						alert(navigator.userAgent.includes('MicroMessenger'));
-						
 						if (navigator.userAgent.includes('MicroMessenger') && wx_data) {
-							alert('wx_data');
 							this.onBridgeReady(wx_data);
 							return;
 						};
@@ -524,7 +519,6 @@ var vm = new Vue({
 				})
 			};
 			if (typeof WeixinJSBridge == "undefined") {
-				alert('invoke');
 				if (document.addEventListener) {
 					document.addEventListener('WeixinJSBridgeReady', callback, false);
 				} else if (document.attachEvent) {
