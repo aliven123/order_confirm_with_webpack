@@ -20,7 +20,8 @@ var ajaxfn = function(url, type, datatype, data, fn) {
 };
 var queryToObj = function() {
 	var res = {};
-	var search = location.search.substr(1);
+	// console.log(decodeURI(location.search));
+	var search = decodeURI(location.search).substr(1);
 	console.log(search);
 	search.split('&').forEach(paramStr => {
 		var arr = paramStr.split('=');
